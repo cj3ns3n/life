@@ -5,16 +5,15 @@ class EntityEngine(threading.Thread):
         threading.Thread.__init__(self)
 
         self.entities = entities
-        self.size = (len(entities[0]), len(entities))
     #end def
 
     def run(self) :
         count = 0
         while True:
-            print('progressing', count)
+            #print('progressing', count)
             count += 1
-            for x in range(self.size[0]):
-                for y in range(self.size[1]):
-                    self.entities[y][x].progress()
+            for entity in self.entities:
+                entity.progress()
+        #end while
     #end def
 #end class
