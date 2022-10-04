@@ -7,7 +7,7 @@ def change_color(color):
     new_r = max(10, color[0] + r_variance)
     new_r = min(new_r, 255)
     new_color = (int(new_r), color[1], color[2])
-    print(new_color)
+    #print(new_color)
     return new_color
 #end def
 
@@ -17,8 +17,8 @@ def entity_color(entity):
     b = int(255.0 * entity.health / 100.0)
 
     entity_color = (r, g, b)
-    print(str(entity))
-    print(entity_color)
+    #print(str(entity))
+    #print(entity_color)
 
     return entity_color
 #end def
@@ -28,18 +28,22 @@ def entity_color(entity):
 pygame.init()
 
 # Initializing surface
-surface = pygame.display.set_mode((400, 300))
+display_size = (400, 300)
+surface = pygame.display.set_mode(display_size)
 
 # Initialing Color
 color = (255,0,0)
 
 game_running = True
 mouse_pos = (0,0)
-entity = Entity()
+entities = [[Entity()] * display_size[0]] * display_size[1]
 while game_running:
-    pygame.draw.rect(surface, entity_color(entity), pygame.Rect(30, 30, 30, 30))
+    for x in range(display_size[0]):
+        for y in range(display_size[1]):
+            pygame.draw.rect(surface, entity_color(entities[y][x]), pygame.Rect(x, y, 1, 1))
+            entities[y][x].progress()
+
     pygame.display.flip()
-    entity.progress()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
