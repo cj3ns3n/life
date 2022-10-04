@@ -1,7 +1,7 @@
 import pygame
 import random
 from entity import Entity
-
+from entity_engine import EntityEngine
 def change_color(color):
     r_variance = color[0] * random.uniform(-0.1, 0.1)
     new_r = max(10, color[0] + r_variance)
@@ -36,12 +36,20 @@ color = (255,0,0)
 
 game_running = True
 mouse_pos = (0,0)
-entities = [[Entity()] * display_size[0]] * display_size[1]
+entities = []
+for y in range(display_size[1]):
+    row = [Entity()] * display_size[0]
+    entities.append(row)
+
+engine = EntityEngine(entities)
+engine.setDaemon(True)
+engine.start()
+
 while game_running:
     for x in range(display_size[0]):
         for y in range(display_size[1]):
             pygame.draw.rect(surface, entity_color(entities[y][x]), pygame.Rect(x, y, 1, 1))
-            entities[y][x].progress()
+            #entities[y][x].progress()
 
     pygame.display.flip()
 
