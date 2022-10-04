@@ -10,10 +10,11 @@ class EntityEngine(threading.Thread):
     def run(self) :
         count = 0
         while True:
-            #print('progressing', count)
+            print('progressing', count)
             count += 1
-            for entity in self.entities:
-                entity.progress()
+            for entity_row in self.entities:
+                for entity in entity_row:
+                    entity.progress()
         #end while
     #end def
 #end class

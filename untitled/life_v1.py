@@ -1,7 +1,7 @@
 import pygame
 import random
 from entity import Entity
-from engine_engine import EngineEngine
+from entity_engine import EntityEngine
 
 def change_color(color):
     r_variance = color[0] * random.uniform(-0.1, 0.1)
@@ -44,8 +44,9 @@ if __name__ == '__main__':
         entities.append(row)
     #end for
 
-    engine = EngineEngine(entities)
-    engine.setDaemon(True)
+    engine = EntityEngine(entities)
+    engine.daemon = True
+    #engine.setDaemon(True)
     engine.start()
 
     while game_running:
