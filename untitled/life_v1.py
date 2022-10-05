@@ -2,6 +2,7 @@ import pygame
 import random
 from entity import Entity
 from entity_engine import EntityEngine
+from info_text import InfoText
 
 def change_color(color):
     r_variance = color[0] * random.uniform(-0.1, 0.1)
@@ -23,7 +24,6 @@ def entity_color(entity):
 
     return entity_color
 #end def
-
 
 if __name__ == '__main__':
     # Initializing Pygame
@@ -49,11 +49,15 @@ if __name__ == '__main__':
     #engine.setDaemon(True)
     engine.start()
 
+    infoText = InfoText()
+
     while game_running:
         for x in range(display_size[0]):
             for y in range(display_size[1]):
                 pygame.draw.rect(surface, entity_color(entities[y][x]), pygame.Rect(x, y, 1, 1))
 
+        text, textRect = infoText.getText()
+        surface.blit(text, textRect)
         pygame.display.flip()
 
         for event in pygame.event.get():
