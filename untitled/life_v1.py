@@ -25,6 +25,16 @@ def entity_color(entity):
     return entity_color
 #end def
 
+class GenerationHandler():
+    def __init__(self, info_text):
+        self.generation = 0
+        self.info_text = info_text
+
+    def set_generation(self, generation):
+        self.generation = generation
+        self.info_text.set_generation(generation)
+#end class
+
 if __name__ == '__main__':
     # Initializing Pygame
     pygame.init()
@@ -34,7 +44,7 @@ if __name__ == '__main__':
     surface = pygame.display.set_mode(display_size)
 
     # Initialing Color
-    color = (255,0,0)
+    color = (255, 0, 0)
 
     infoText = InfoText()
 
@@ -48,7 +58,8 @@ if __name__ == '__main__':
         entities.append(row)
     #end for
 
-    engine = EntityEngine(entities, infoText)
+    handler = GenerationHandler(infoText)
+    engine = EntityEngine(entities, handler)
     engine.daemon = True
     #engine.setDaemon(True)
     engine.start()
@@ -58,16 +69,39 @@ if __name__ == '__main__':
         display_count += 1
         infoText.set_display_count(display_count)
 
+        max_x = 0
+        max_y = 0
         for x in range(display_size[0]):
             for y in range(display_size[1]):
-                pygame.draw.rect(surface, entity_color(entities[y][x]), pygame.Rect(x, y, 1, 1))
+                entity = entities[y][x]
+                if handler.generation <= 1 or entity.age > handler.generation - 1:
+                    max_x = x
+                    max_y = max(max_y, y)
+                    entity_rect = pygame.Rect(x, y, 1, 1)
+                    pygame.draw.rect(surface, entity_color(entity), entity_rect)
+                    #if handler.generation > 1:
+                    #    print('(%03d, %03d) %03d, %03d, %03d' % (max_x, max_y, display_count, entity.age, handler.generation))
+                    #pygame.display.update(entity_rect)
+            #end for
+        #end for
 
         gen_text = infoText.get_generation_text()
         surface.blit(gen_text[0], gen_text[1])
         display_text = infoText.get_display_text()
         surface.blit(display_text[0], display_text[1])
 
-        pygame.display.flip()
+        if display_count <= 1:
+            pygame.display.flip()
+            #print('flip')
+        else:
+            gen_text_rec = gen_text[1]
+            display_text_rec = display_text[1]
+            width = max(gen_text_rec.width, display_text_rec.width, max_x) + 1
+            height = max(gen_text_rec.height + display_text_rec.height, max_y) + 1
+            update_rect = pygame.Rect(0, 0, width, height)
+            #print(update_rect)
+            pygame.display.update(update_rect)
+        #end if
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -79,9 +113,9 @@ if __name__ == '__main__':
                     break
 
         pos = pygame.mouse.get_pos()
-        if (pos[0] != mouse_pos[0] or pos[1] != mouse_pos[1]):
+        if pos[0] != mouse_pos[0] or pos[1] != mouse_pos[1]:
             mouse_pos = pos
-            print('mouse position',pos)
+            print('mouse position', pos)
     #end while
 
     pygame.quit()
