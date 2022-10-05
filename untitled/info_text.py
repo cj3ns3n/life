@@ -2,14 +2,22 @@ import pygame
 
 class InfoText():
     def __init__(self):
+        self.font = pygame.font.Font(None, 18)
+
+        self.generation = 0
+        self.updated = True
+    #end def
+
+    def set_generation(self, generation):
+        self.generation = generation
+
+    def getText(self):
         green = (0, 255, 0)
         blue = (0, 0, 128)
 
-        font = pygame.font.Font(None, 18)
-        self.text = font.render('Generation', True, green, blue)
-        self.textRect = self.text.get_rect()
-        self.textRect.center = (35, 10)
-    #end def
+        text = self.font.render('Generation %d' % self.generation, True, green, blue)
+        textRect = text.get_rect()
+        textRect.center = (35, 10)
 
-    def getText(self):
-        return (self.text, self.textRect)
+        self.updated = False
+        return (text, textRect)

@@ -36,6 +36,8 @@ if __name__ == '__main__':
     # Initialing Color
     color = (255,0,0)
 
+    infoText = InfoText()
+
     game_running = True
     mouse_pos = (0,0)
     entities = []
@@ -46,20 +48,19 @@ if __name__ == '__main__':
         entities.append(row)
     #end for
 
-    engine = EntityEngine(entities)
+    engine = EntityEngine(entities, infoText)
     engine.daemon = True
     #engine.setDaemon(True)
     engine.start()
-
-    infoText = InfoText()
 
     while game_running:
         for x in range(display_size[0]):
             for y in range(display_size[1]):
                 pygame.draw.rect(surface, entity_color(entities[y][x]), pygame.Rect(x, y, 1, 1))
 
-        text, textRect = infoText.getText()
-        surface.blit(text, textRect)
+        newText = infoText.getText()
+        surface.blit(newText[0], newText[1])
+
         pygame.display.flip()
 
         for event in pygame.event.get():

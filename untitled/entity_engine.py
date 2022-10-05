@@ -1,17 +1,19 @@
 import threading
 
 class EntityEngine(threading.Thread):
-    def __init__(self, entities):
+    def __init__(self, entities, generation_handler):
         threading.Thread.__init__(self)
 
         self.entities = entities
+        self.generation_handler = generation_handler
     #end def
 
     def run(self) :
         count = 0
         while True:
-            print('progressing', count)
+            #print('progressing', count)
             count += 1
+            self.generation_handler.set_generation(count)
             for entity_row in self.entities:
                 for entity in entity_row:
                     entity.progress()
