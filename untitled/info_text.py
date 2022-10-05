@@ -17,7 +17,8 @@ class InfoText():
 
         text = self.font.render('Generation %d' % self.generation, True, green, blue)
         textRect = text.get_rect()
-        textRect.center = (35, 10)
+        textRect.topleft = (10, 10)
+#        textRect.center = (35, 10)
 
         self.updated = False
         return (text, textRect)
