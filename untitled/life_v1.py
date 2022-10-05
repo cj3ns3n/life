@@ -53,13 +53,19 @@ if __name__ == '__main__':
     #engine.setDaemon(True)
     engine.start()
 
+    display_count = 0
     while game_running:
+        display_count += 1
+        infoText.set_display_count(display_count)
+
         for x in range(display_size[0]):
             for y in range(display_size[1]):
                 pygame.draw.rect(surface, entity_color(entities[y][x]), pygame.Rect(x, y, 1, 1))
 
-        newText = infoText.getText()
-        surface.blit(newText[0], newText[1])
+        gen_text = infoText.get_generation_text()
+        surface.blit(gen_text[0], gen_text[1])
+        display_text = infoText.get_display_text()
+        surface.blit(display_text[0], display_text[1])
 
         pygame.display.flip()
 
