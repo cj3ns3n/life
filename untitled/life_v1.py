@@ -40,7 +40,9 @@ if __name__ == '__main__':
     mouse_pos = (0,0)
     entities = []
     for y in range(display_size[1]):
-        row = [Entity()] * display_size[0]
+        row = []
+        for x in range(display_size[0]):
+            row.append(Entity())
         entities.append(row)
     #end for
 
