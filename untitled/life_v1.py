@@ -135,6 +135,7 @@ if __name__ == '__main__':
                 width = display_size[1]
                 height = max_row - min_row + 1
                 update_rect = pygame.Rect(0, min(updated_rows), width, height)
+                #print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
                 #print(update_rect)
                 pygame.display.update(update_rect)
             #end if
@@ -143,7 +144,7 @@ if __name__ == '__main__':
             gen_text_rec = gen_text[1]
             display_text_rec = display_text[1]
 
-            print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
+            #print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
             if gen_text_rec.top > max_row or display_text_rec.bottom < min_row:
                 height = gen_text_rec.height + display_text_rec.height
                 width = max([gen_text_rec.width, display_text_rec.width])
