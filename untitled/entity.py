@@ -23,7 +23,7 @@ class Entity:
 
         # size determined by health and age
         variance = self.health * random.uniform(-0.001, 0.001)
-        self.size = math.log(self.age) + variance
+        self.size = max(0.1, math.log(self.age) + variance)
         self.size = min(100, self.size)
     #end def
 
@@ -31,5 +31,5 @@ class Entity:
         return repr(self)
 
     def __repr__(self):
-        return '(%d, %.3f, %.1f)' % (self.age, self.size, self.health)
+        return '(age: %d, size: %.3f, health: %.1f)' % (self.age, self.size, self.health)
 #end class
