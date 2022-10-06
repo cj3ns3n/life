@@ -76,6 +76,8 @@ if __name__ == '__main__':
         surface.blit(gen_text[0], gen_text[1])
         display_text = infoText.get_display_text()
         surface.blit(display_text[0], display_text[1])
+        entity_text = infoText.get_entity_text()
+        surface.blit(entity_text[0], entity_text[1])
 
         if display_count <= 1:
             pygame.display.flip()
@@ -102,12 +104,14 @@ if __name__ == '__main__':
             # refresh info text
             gen_text_rec = gen_text[1]
             display_text_rec = display_text[1]
+            entity_text_rec = entity_text[1]
 
             #print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
             if gen_text_rec.top > max_row or display_text_rec.bottom < min_row:
-                height = gen_text_rec.height + display_text_rec.height
-                width = max([gen_text_rec.width, display_text_rec.width])
+                height = gen_text_rec.height + display_text_rec.height + entity_text_rec.height
+                width = max([gen_text_rec.width, display_text_rec.width, entity_text_rec.width])
                 update_rect = pygame.Rect(gen_text_rec.left, gen_text_rec.top, width, height)
+
                 pygame.display.update(update_rect)
             #end def
         #end if
@@ -125,7 +129,8 @@ if __name__ == '__main__':
         pos = pygame.mouse.get_pos()
         if pos[0] != mouse_pos[0] or pos[1] != mouse_pos[1]:
             mouse_pos = pos
-            print('mouse position', pos)
+            #print('mouse position', pos)
+            infoText.set_entity(entities[pos[1]][pos[0]], (pos[0], pos[1]))
     #end while
 
     pygame.quit()

@@ -31,5 +31,5 @@ class Entity:
         return repr(self)
 
     def __repr__(self):
-        return 'entity: (%s, %s, %s)' % (self.age, self.size, self.health)
+        return '(%d, %.3f, %.1f)' % (self.age, self.size, self.health)
 #end class
