@@ -9,14 +9,17 @@ class EntityEngine(threading.Thread):
     #end def
 
     def run(self) :
-        count = 0
+        generationCount = 0
         while True:
             #print('progressing', count)
-            count += 1
-            self.generation_handler.set_generation(count)
+            generationCount += 1
+            self.generation_handler.set_generation(generationCount)
+            rowCount = 0
             for entity_row in self.entities:
                 for entity in entity_row:
                     entity.progress()
+                self.generation_handler.row_progressed(rowCount)
+                rowCount += 1
         #end while
     #end def
 #end class

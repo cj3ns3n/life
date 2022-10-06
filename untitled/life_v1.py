@@ -25,14 +25,38 @@ def entity_color(entity):
     return entity_color
 #end def
 
+def render_rows(entities, x_range, y_range):
+    for x in range(x_range[0], x_range[1]):
+        for y in range(y_range[0], y_range[1]):
+            entity = entities[y][x]
+            entity_rect = pygame.Rect(x, y, 1, 1)
+            pygame.draw.rect(surface, entity_color(entity), entity_rect)
+        #end for
+    #end for
+#end def
+
 class GenerationHandler():
     def __init__(self, info_text):
         self.generation = 0
+        self.updated_rows = []
         self.info_text = info_text
+    #end def
 
     def set_generation(self, generation):
         self.generation = generation
         self.info_text.set_generation(generation)
+    #end def
+
+    def row_progressed(self, row_idx):
+        self.updated_rows.append(row_idx)
+        #print('updated row: %d' % row_idx)
+    #end def
+
+    def get_processed_rows(self):
+        rows = self.updated_rows.copy()
+        self.updated_rows = []
+        return rows
+    #end def
 #end class
 
 if __name__ == '__main__':
@@ -64,11 +88,14 @@ if __name__ == '__main__':
     #engine.setDaemon(True)
     engine.start()
 
+    render_rows(entities, (0, display_size[0]), (0, display_size[1]))
+
     display_count = 0
     while game_running:
         display_count += 1
         infoText.set_display_count(display_count)
 
+        """
         max_x = 0
         max_y = 0
         for x in range(display_size[0]):
@@ -84,6 +111,7 @@ if __name__ == '__main__':
                     #pygame.display.update(entity_rect)
             #end for
         #end for
+        """
 
         gen_text = infoText.get_generation_text()
         surface.blit(gen_text[0], gen_text[1])
@@ -94,23 +122,45 @@ if __name__ == '__main__':
             pygame.display.flip()
             #print('flip')
         else:
+            # refresh updated entities
+            max_row = 0
+            min_row = 0
+            updated_rows = handler.get_processed_rows()
+            if len(updated_rows) > 0:
+                max_row = max(updated_rows)
+                min_row = min(updated_rows)
+
+                render_rows(entities, (0, display_size[0]), (min_row, max_row + 1))
+
+                width = display_size[1]
+                height = max_row - min_row + 1
+                update_rect = pygame.Rect(0, min(updated_rows), width, height)
+                #print(update_rect)
+                pygame.display.update(update_rect)
+            #end if
+
+            # refresh info text
             gen_text_rec = gen_text[1]
             display_text_rec = display_text[1]
-            width = max(gen_text_rec.width, display_text_rec.width, max_x) + 1
-            height = max(gen_text_rec.height + display_text_rec.height, max_y) + 1
-            update_rect = pygame.Rect(0, 0, width, height)
-            #print(update_rect)
-            pygame.display.update(update_rect)
+
+            print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
+            if gen_text_rec.top > max_row or display_text_rec.bottom < min_row:
+                height = gen_text_rec.height + display_text_rec.height
+                width = max([gen_text_rec.width, display_text_rec.width])
+                update_rect = pygame.Rect(gen_text_rec.left, gen_text_rec.top, width, height)
+                pygame.display.update(update_rect)
+            #end def
         #end if
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_running = False
                 break
-            if event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game_running = False
                     break
+        #end for
 
         pos = pygame.mouse.get_pos()
         if pos[0] != mouse_pos[0] or pos[1] != mouse_pos[1]:
