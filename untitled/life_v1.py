@@ -3,6 +3,7 @@ import random
 from entity import Entity
 from entity_engine import EntityEngine
 from info_text import InfoText
+from generation_handler import GenerationHandler
 
 def change_color(color):
     r_variance = color[0] * random.uniform(-0.1, 0.1)
@@ -34,30 +35,6 @@ def render_rows(entities, x_range, y_range):
         #end for
     #end for
 #end def
-
-class GenerationHandler():
-    def __init__(self, info_text):
-        self.generation = 0
-        self.updated_rows = []
-        self.info_text = info_text
-    #end def
-
-    def set_generation(self, generation):
-        self.generation = generation
-        self.info_text.set_generation(generation)
-    #end def
-
-    def row_progressed(self, row_idx):
-        self.updated_rows.append(row_idx)
-        #print('updated row: %d' % row_idx)
-    #end def
-
-    def get_processed_rows(self):
-        rows = self.updated_rows.copy()
-        self.updated_rows = []
-        return rows
-    #end def
-#end class
 
 if __name__ == '__main__':
     # Initializing Pygame
@@ -94,24 +71,6 @@ if __name__ == '__main__':
     while game_running:
         display_count += 1
         infoText.set_display_count(display_count)
-
-        """
-        max_x = 0
-        max_y = 0
-        for x in range(display_size[0]):
-            for y in range(display_size[1]):
-                entity = entities[y][x]
-                if handler.generation <= 1 or entity.age > handler.generation - 1:
-                    max_x = x
-                    max_y = max(max_y, y)
-                    entity_rect = pygame.Rect(x, y, 1, 1)
-                    pygame.draw.rect(surface, entity_color(entity), entity_rect)
-                    #if handler.generation > 1:
-                    #    print('(%03d, %03d) %03d, %03d, %03d' % (max_x, max_y, display_count, entity.age, handler.generation))
-                    #pygame.display.update(entity_rect)
-            #end for
-        #end for
-        """
 
         gen_text = infoText.get_generation_text()
         surface.blit(gen_text[0], gen_text[1])
