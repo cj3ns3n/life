@@ -41,7 +41,7 @@ if __name__ == '__main__':
     pygame.init()
 
     # Initializing surface
-    display_size = (400, 300)
+    display_size = (600, 300)
     surface = pygame.display.set_mode(display_size)
 
     # Initialing Color
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
                 render_rows(entities, (0, display_size[0]), (min_row, max_row + 1))
 
-                width = display_size[1]
+                width = display_size[0]
                 height = max_row - min_row + 1
                 update_rect = pygame.Rect(0, min(updated_rows), width, height)
                 #print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
