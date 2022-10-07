@@ -23,8 +23,10 @@ class LifeDisplay:
         self.engine.start()
 
         self.max_age = 0
-        self.max_size = 0
-        self.max_health = 0
+        self.max_size = 10
+        self.min_size = 10
+        self.max_health = 100
+        self.min_health = 75
     #end def
 
     def birth_entities(self, size):
@@ -40,20 +42,26 @@ class LifeDisplay:
     #end def
 
     def entity_color(self, entity):
-        if entity.age > self.max_age:
-            self.max_age = entity.age
-        if entity.size > self.max_size:
-            self.max_size = entity.size
-        if entity.health > self.max_health:
-            self.max_health = entity.health
+        entity_color = (0, 0, 0)
+        if entity.health > 0:
+            if entity.age > self.max_age:
+                self.max_age = entity.age
+            if entity.size > self.max_size:
+                self.max_size = entity.size
+            if entity.size < self.min_size:
+                self.min_size = entity.size
+            if entity.health < self.min_health:
+                self.min_health = entity.health
 
-        r = int(255.0 * entity.age / self.max_age)
-        g = int(255.0 * entity.size / self.max_size)
-        b = int(255.0 * entity.health / self.max_health)
+            r = int(255.0 * entity.age / self.max_age)
+            g = int(255.0 * (entity.size - self.min_size) / (self.max_size - self.min_size))
+            b = int(255.0 * (entity.health - self.min_health) / (self.max_health - self.min_health))
+            
+            entity_color = (r, g, b)
 
-        entity_color = (r, g, b)
-        #print(str(entity))
-        #print(entity_color)
+            if r < 0 or r > 255 or g < 0 or g > 255 or b < 0 or b > 255:
+                print('%s: %s' % (str(entity_color), str(entity)))
+        # end if
 
         return entity_color
     #end def
