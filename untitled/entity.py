@@ -1,30 +1,42 @@
 import math
 from statistics import mean
-import random
+#import random
+from numpy import random
 
 class Entity:
+    health_range = 5
+    size_range = 1
+
     def __init__(self):
         self.age = 0
         self.size = 1
         self.health = 100
     #end def
 
-    def progress(self):
+    def progress(self, neighbors = []):
         self.age += 1
 
-        # health detrimentally determined by size and age and randomness
-        variance = self.health * random.uniform(-0.01, 0.1)
-        age_factor = math.log(self.age)
-        size_factor = math.log(int(self.size)+1)
-        health_factor = math.log(max(int(mean([age_factor, size_factor])), 1))
-        #print('health info: (%s, %s, %s, %s)' % (variance, age_factor, size_factor, health_factor))
-        self.health = min(self.health + variance - health_factor, 100)
-        self.health = max(10, self.health)
+        if self.health > 0:
+            live_neighbors = list(filter(lambda entity: entity.health > 0, neighbors))
+            #if len(live_neighbors) > 0:
+            if False:
+                avg_size = (sum(neighbor.size for neighbor in live_neighbors) + self.size) / (len(live_neighbors) + 1)
+                avg_health = (sum(neighbor.health for neighbor in live_neighbors) + self.health) / (len(live_neighbors) + 1)
 
-        # size determined by health and age
-        variance = self.health * random.uniform(-0.001, 0.001)
-        self.size = max(0.1, math.log(self.age) + variance)
-        self.size = min(100, self.size)
+                self.size = avg_size
+                self.health = avg_health
+
+                if self.health > 100:
+                    print('too healthy: %s, %f, %f %d' % (str(self), avg_size, avg_health, len(live_neighbors)))
+                    for neighbor in live_neighbors:
+                        print('\t%s' % str(neighbor))
+            else:
+                # health detrimentally determined by size and age and randomness
+                self.health = min(100, random.normal(self.health, Entity.health_range))
+                self.health = max(0, self.health)
+
+                self.size = max(0.1, random.normal(self.size, Entity.size_range))
+            #end if
     #end def
 
     def __str__(self):

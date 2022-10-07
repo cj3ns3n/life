@@ -56,7 +56,7 @@ class LifeDisplay:
             r = int(255.0 * entity.age / self.max_age)
             g = int(255.0 * (entity.size - self.min_size) / (self.max_size - self.min_size))
             b = int(255.0 * (entity.health - self.min_health) / (self.max_health - self.min_health))
-            
+
             entity_color = (r, g, b)
 
             if r < 0 or r > 255 or g < 0 or g > 255 or b < 0 or b > 255:
