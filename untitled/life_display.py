@@ -6,14 +6,11 @@ from generation_handler import GenerationHandler
 
 class LifeDisplay:
     def __init__(self, display_size = (600, 300)):
-        # Initializing Pygame
         pygame.init()
-
-        self.entities = self.birth_entities(display_size)
-
-        # Initializing surface
         self.display_size = display_size
         self.surface = pygame.display.set_mode(display_size)
+
+        self.entities = self.birth_entities(display_size)
 
         self.infoText = InfoText()
 
