@@ -23,7 +23,7 @@ class LifeDisplay:
         self.engine.start()
 
         self.max_age = 100
-        self.max_size = 10
+        self.max_size = 1
         self.min_size = 10
         self.max_health = 100
         self.min_health = 75
