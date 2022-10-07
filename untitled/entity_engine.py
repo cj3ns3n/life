@@ -23,6 +23,19 @@ class EntityEngine(threading.Thread):
         return neighbors
     #end def
 
+    def get_dead_neighbor_pos(self, pos):
+        if pos[0] > 0 and not self.entities[pos[1]][pos[0]-1].health > 0: # left neighbor
+            return (pos[0]-1, pos[1])
+        if pos[0] < self.size[0] - 1 and not self.entities[pos[1]][pos[0]+1].health > 0: # right neighbor
+            return (pos[0]+1, pos[1])
+        if pos[1] > 0 and not self.entities[pos[1]-1][pos[0]].health > 0: # top neighbor
+            return (pos[0], pos[1]-1)
+        if pos[1] < self.size[1] - 1 and not self.entities[pos[1]+1][pos[0]].health > 0: # bottom neighbor
+            return (pos[0], pos[1]+1)
+
+        return None
+    #end def
+
     def run(self) :
         generationCount = 0
         while True:
@@ -31,7 +44,22 @@ class EntityEngine(threading.Thread):
             self.generation_handler.set_generation(generationCount)
             for y in range(self.size[1]):
                 for x in range(self.size[0]):
-                    self.entities[y][x].progress(self.get_neighbors((x, y)))
+                    neighbors = self.get_neighbors((x, y))
+                    entity = self.entities[y][x]
+                    if entity.health > 0:
+                        child = entity.progress(neighbors)
+                        if not entity.health > 0:
+                            self.generation_handler.increment_deaths()
+                        if child:
+                            new_pos = self.get_dead_neighbor_pos((x, y))
+                            if new_pos:
+                                #print('dead: %s' % (str(self.entities[new_pos[1]][new_pos[0]])))
+                                self.entities[new_pos[1]][new_pos[0]] = child
+                                self.generation_handler.increment_births()
+                            # end if
+                        #end if
+                    # end if
+                # end for
                 self.generation_handler.row_progressed(y)
         #end while
     #end def

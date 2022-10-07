@@ -89,6 +89,8 @@ class LifeDisplay:
 
             gen_text = self.infoText.get_generation_text()
             self.surface.blit(gen_text[0], gen_text[1])
+            births_text = self.infoText.get_census_text()
+            self.surface.blit(births_text[0], births_text[1])
             display_text = self.infoText.get_display_text()
             self.surface.blit(display_text[0], display_text[1])
             entity_text = self.infoText.get_entity_text()
@@ -117,13 +119,14 @@ class LifeDisplay:
 
                 # refresh info text
                 gen_text_rec = gen_text[1]
+                births_text_rec = births_text[1]
                 display_text_rec = display_text[1]
                 entity_text_rec = entity_text[1]
 
                 #print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
                 if gen_text_rec.top > max_row or display_text_rec.bottom < min_row:
-                    height = gen_text_rec.height + display_text_rec.height + entity_text_rec.height
-                    width = max([gen_text_rec.width, display_text_rec.width, entity_text_rec.width])
+                    height = gen_text_rec.height + births_text_rec.height + display_text_rec.height + entity_text_rec.height
+                    width = max([gen_text_rec.width, births_text_rec.width, display_text_rec.width, entity_text_rec.width])
                     update_rect = pygame.Rect(gen_text_rec.left, gen_text_rec.top, width, height)
 
                     pygame.display.update(update_rect)
