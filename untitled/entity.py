@@ -10,7 +10,11 @@ class Entity:
     def __init__(self):
         self.age = 0
         self.size = 1
-        self.health = 100
+
+        self.health = min(100, random.normal(75, 50))
+        self.health = max(0, self.health)
+
+        self.size = max(0.1, random.normal(1, Entity.size_range))
     #end def
 
     def progress(self, neighbors = []):
