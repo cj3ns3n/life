@@ -18,24 +18,19 @@ class Entity:
 
         if self.health > 0:
             live_neighbors = list(filter(lambda entity: entity.health > 0, neighbors))
-            #if len(live_neighbors) > 0:
-            if False:
-                avg_size = (sum(neighbor.size for neighbor in live_neighbors) + self.size) / (len(live_neighbors) + 1)
-                avg_health = (sum(neighbor.health for neighbor in live_neighbors) + self.health) / (len(live_neighbors) + 1)
-
-                self.size = avg_size
-                self.health = avg_health
-
-                if self.health > 100:
-                    print('too healthy: %s, %f, %f %d' % (str(self), avg_size, avg_health, len(live_neighbors)))
-                    for neighbor in live_neighbors:
-                        print('\t%s' % str(neighbor))
+            if len(live_neighbors) > 0:
+                local_health = (sum(neighbor.health for neighbor in live_neighbors) + self.health) / (len(live_neighbors) + 1)
+                local_size = (sum(neighbor.size for neighbor in live_neighbors) + self.size) / (len(live_neighbors) + 1)
             else:
-                # health detrimentally determined by size and age and randomness
-                self.health = min(100, random.normal(self.health, Entity.health_range))
-                self.health = max(0, self.health)
+                local_health = self.health
+                local_size = self.size
+            #end if
 
-                self.size = max(0.1, random.normal(self.size, Entity.size_range))
+            # health detrimentally determined by size and age and randomness
+            self.health = min(100, random.normal(local_health, Entity.health_range))
+            self.health = max(0, self.health)
+
+            self.size = max(0.1, random.normal(local_size, Entity.size_range))
             #end if
     #end def
 
