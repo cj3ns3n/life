@@ -41,7 +41,7 @@ class Entity:
     def calc_health(self, neighbors=[]):
         # y=40 log(-x+100)+20  logarithmic decline to 100
         try:
-            health = 40 * math.log(-self.age + self.initial_health_factor, 10) + self.initial_health_factor
+            health = 40 * math.log(-self.age + self.life_expectancy, 10) + self.initial_health_factor
             live_neighbors = list(filter(lambda entity: entity.health > 0, neighbors))
             if len(live_neighbors) > 0:
                 local_health = sum(neighbor.health for neighbor in live_neighbors) / len(live_neighbors)
