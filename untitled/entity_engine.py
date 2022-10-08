@@ -22,8 +22,8 @@ class EntityEngine(threading.Thread):
                     entity = self.entities[pos]
                     if entity.health > 0:
                         child = entity.progress(neighbors)
-                        if y == 0:
-                            print(entity.health)
+                        #if x == 0:
+                        #    print((entity.age, entity.health, entity.initial_health_factor, entity.life_expectancy))
                         if not entity.health > 0:
                             self.generation_handler.increment_deaths()
                         if child:
