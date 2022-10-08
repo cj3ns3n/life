@@ -1,40 +1,63 @@
 import numpy as np
 import random
 from pos import Pos
+import math
 
 class Entity:
     health_range = 5
     size_range = 1
     sexes = ['m', 'f']
+    life_expectancy = 100  # number of cycles an entity is expected to live
+    initial_health_factor = 20  # less than 20 gives less than 100% birth health.
 
-    def __init__(self, parents = None):
+    def __init__(self, parents=None):
         self.age = 0
         self.sex = random.choice(Entity.sexes)
 
-        if parents is None:
-            self.health = min(100, np.random.normal(75, 50))
-            self.health = max(10, self.health)
+        self.health = self.get_initial_health(parents)
 
+        if parents is None:
             self.size = max(0.1, np.random.normal(1, Entity.size_range))
         else:
-            self.health = np.random.normal(Entity.health_range, Entity.health_range) + (parents[0].health + parents[1].health) / 2.0
-            self.health = min(100, self.health)
-
-            self.size = 0.5 * (parents[0].size + parents[1].size) / 2.0
+            avg_size = (parents[0].size + parents[1].size) / 2.0
+            self.size = 0.5 * np.random.normal(avg_size, Entity.size_range)
         # end if
     # end def
 
-    def procreate(self, neighbors):
-        for neighbor in neighbors:
-            if neighbor.sex != self.sex:
-                return Entity((self, neighbor))
+    def get_initial_health(self, parents):
+        if parents is None:
+            self.life_expectancy = np.random.normal(Entity.life_expectancy, Entity.health_range)
+            self.initial_health_factor = np.random.normal(Entity.initial_health_factor, Entity.health_range-3)
+        else:
+            avg_expectancy = (parents[0].life_expectancy + parents[1].life_expectancy) / 2.0
+            avg_factor = (parents[0].initial_health_factor + parents[1].initial_health_factor) / 2.0
+            self.life_expectancy = np.random.normal(avg_expectancy, Entity.health_range)
+            self.initial_health_factor = np.random.normal(avg_factor, Entity.health_range-3)
+        # end if
 
-        return None
+        # end if
+        return self.calc_health()
     # end def
 
-    def progress(self, neighbors = []):
-        self.age += 1
+    def calc_health(self, neighbors=[]):
+        # y=40 log(-x+100)+20  logarithmic decline to 100
+        try:
+            health = 40 * math.log(-self.age + self.initial_health_factor, 10) + self.initial_health_factor
+            live_neighbors = list(filter(lambda entity: entity.health > 0, neighbors))
+            if len(live_neighbors) > 0:
+                local_health = sum(neighbor.health for neighbor in live_neighbors) / len(live_neighbors)
+                health = (health + local_health) / 2
+            # end if
+        except ValueError:
+            return 0.0
 
+        health = min(100, health)
+        health = max(0, health)
+
+        return health
+    # end def
+
+    def calc_eternal_health(self, neighbors):
         if self.health > 0:
             live_neighbors = list(filter(lambda entity: entity.health > 0, neighbors))
             if len(live_neighbors) > 0:
@@ -45,9 +68,33 @@ class Entity:
                 local_size = self.size
             # end if
 
-            self.health = min(100, np.random.normal(local_health, Entity.health_range))
-            self.health = max(0, self.health)
+            self.health = self.calc_health()
+            self.size = max(0.1, np.random.normal(local_size, Entity.size_range))
 
+            if 0 < len(live_neighbors) < len(neighbors):
+                return self.procreate(live_neighbors)
+        #end if
+    # end def
+
+    def procreate(self, neighbors):
+        for neighbor in neighbors:
+            if neighbor.sex != self.sex:
+                return Entity((self, neighbor))
+
+        return None
+    # end def
+
+    def progress(self, neighbors=[]):
+        self.age += 1
+        self.health = self.calc_health(neighbors)
+
+        if self.health > 0:
+            live_neighbors = list(filter(lambda entity: entity.health > 0, neighbors))
+            if len(live_neighbors) > 0:
+                local_size = (sum(neighbor.size for neighbor in live_neighbors) + self.size) / (len(live_neighbors) + 1)
+            else:
+                local_size = self.size
+            # end if
             self.size = max(0.1, np.random.normal(local_size, Entity.size_range))
 
             if 0 < len(live_neighbors) < len(neighbors):

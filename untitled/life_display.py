@@ -22,7 +22,7 @@ class LifeDisplay:
         self.engine.daemon = True
         self.engine.start()
 
-        self.max_age = 100
+        self.max_age = 120
         self.max_size = 2
         self.min_size = 1
         self.max_health = 100
@@ -33,7 +33,7 @@ class LifeDisplay:
         entity_color = (0, 0, 0)
         if entity.health > 0:
             if entity.age > self.max_age:
-                self.max_age = self.max_age * 10
+                self.max_age = entity.age
             if entity.size > self.max_size:
                 self.max_size = entity.size
             if entity.size < self.min_size:
