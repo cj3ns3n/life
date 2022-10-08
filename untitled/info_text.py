@@ -12,6 +12,37 @@ class InfoText():
         self.births = 0
         self.deaths = 0
         self.entity = None
+        self.rect = pygame.Rect(0, 0, 0, 0)
+    # end def
+
+    def blit(self, surface):
+        gen_text = self.get_generation_text()
+        gen_text_rec = gen_text.get_rect()
+        gen_text_rec.topleft = (10, 10)
+        surface.blit(gen_text, gen_text_rec)
+
+        births_text = self.get_census_text()
+        births_text_rec = births_text.get_rect()
+        births_text_rec.topleft = (10, 20)
+        surface.blit(births_text, births_text_rec)
+
+        display_text = self.get_display_text()
+        display_text_rec = display_text.get_rect()
+        display_text_rec.topleft = (10, 30)
+        surface.blit(display_text, display_text_rec)
+
+        entity_text = self.get_entity_text()
+        entity_text_rec = entity_text.get_rect()
+        entity_text_rec.topleft = (10, 40)
+        surface.blit(entity_text, entity_text_rec)
+
+        height = gen_text_rec.height + births_text_rec.height + display_text_rec.height + entity_text_rec.height
+        width = max([gen_text_rec.width, births_text_rec.width, display_text_rec.width, entity_text_rec.width])
+        self.rect = pygame.Rect(gen_text_rec.left, gen_text_rec.top, width, height)
+    # end def
+
+    def get_rect(self):
+        return self.rect
     # end def
 
     def set_generation(self, generation):

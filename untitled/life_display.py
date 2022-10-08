@@ -86,26 +86,7 @@ class LifeDisplay:
         while game_running:
             display_count += 1
             self.infoText.set_display_count(display_count)
-
-            gen_text = self.infoText.get_generation_text()
-            gen_text_rec = gen_text.get_rect()
-            gen_text_rec.topleft = (10, 10)
-            self.surface.blit(gen_text, gen_text_rec)
-
-            births_text = self.infoText.get_census_text()
-            births_text_rec = births_text.get_rect()
-            births_text_rec.topleft = (10, 20)
-            self.surface.blit(births_text, births_text_rec)
-
-            display_text = self.infoText.get_display_text()
-            display_text_rec = display_text.get_rect()
-            display_text_rec.topleft = (10, 30)
-            self.surface.blit(display_text, display_text_rec)
-
-            entity_text = self.infoText.get_entity_text()
-            entity_text_rec = entity_text.get_rect()
-            entity_text_rec.topleft = (10, 40)
-            self.surface.blit(entity_text, entity_text_rec)
+            self.infoText.blit(self.surface)
 
             if display_count <= 1:
                 pygame.display.flip()
@@ -128,14 +109,7 @@ class LifeDisplay:
                     pygame.display.update(update_rect)
                 #end if
 
-                #print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
-                if gen_text_rec.top > max_row or display_text_rec.bottom < min_row:
-                    height = gen_text_rec.height + births_text_rec.height + display_text_rec.height + entity_text_rec.height
-                    width = max([gen_text_rec.width, births_text_rec.width, display_text_rec.width, entity_text_rec.width])
-                    update_rect = pygame.Rect(gen_text_rec.left, gen_text_rec.top, width, height)
-
-                    pygame.display.update(update_rect)
-                #end def
+                pygame.display.update(self.infoText.get_rect())
             #end if
 
             # save periodic image
