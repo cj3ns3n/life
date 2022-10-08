@@ -12,7 +12,7 @@ class InfoText():
         self.births = 0
         self.deaths = 0
         self.entity = None
-    #end def
+    # end def
 
     def set_generation(self, generation):
         self.generation = generation
@@ -22,8 +22,8 @@ class InfoText():
         textRect = text.get_rect()
         textRect.topleft = (10, 10)
 
-        return (text, textRect)
-    #end def
+        return text
+    # end def
 
     def set_deaths(self, death_count):
         self.deaths = death_count
@@ -36,8 +36,8 @@ class InfoText():
         textRect = text.get_rect()
         textRect.topleft = (10, 20)
 
-        return (text, textRect)
-    #end def
+        return text
+    # end def
 
     def set_display_count(self, display_count):
         self.display_count = display_count
@@ -47,8 +47,8 @@ class InfoText():
         textRect = text.get_rect()
         textRect.topleft = (10, 30)
 
-        return (text, textRect)
-    #end def
+        return text
+    # end def
 
     def set_entity(self, entity, entity_pos):
         self.entity = entity
@@ -63,6 +63,6 @@ class InfoText():
         textRect = text.get_rect()
         textRect.topleft = (10, 40)
 
-        return (text, textRect)
-    #end def
-#end def
+        return text
+    # end def
+# end def
