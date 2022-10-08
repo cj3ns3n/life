@@ -1,5 +1,5 @@
 import pygame
-from entity import Entity
+from entities import Entities
 from entity_engine import EntityEngine
 from info_text import InfoText
 from generation_handler import GenerationHandler
@@ -13,7 +13,7 @@ class LifeDisplay:
         self.display_size = display_size
         self.surface = pygame.display.set_mode(display_size)
 
-        self.entities = self.birth_entities(display_size)
+        self.entities = Entities(display_size)
 
         self.infoText = InfoText()
 
@@ -27,18 +27,6 @@ class LifeDisplay:
         self.min_size = 1
         self.max_health = 100
         self.min_health = 75
-    #end def
-
-    def birth_entities(self, size):
-        entities = []
-        for y in range(size[1]):
-            row = []
-            for x in range(size[0]):
-                row.append(Entity())
-            entities.append(row)
-        #end for
-
-        return entities
     #end def
 
     def entity_color(self, entity):
@@ -64,17 +52,17 @@ class LifeDisplay:
         # end if
 
         return entity_color
-    #end def
+    # end def
 
     def render_rows(self, x_range, y_range):
         for x in range(x_range[0], x_range[1]):
             for y in range(y_range[0], y_range[1]):
-                entity = self.entities[y][x]
+                entity = self.entities[Pos(x, y)]
                 entity_rect = pygame.Rect(x, y, 1, 1)
                 pygame.draw.rect(self.surface, self.entity_color(entity), entity_rect)
-            #end for
-        #end for
-    #end def
+            # end for
+        # end for
+    # end def
 
     def display(self):
         game_running = True
@@ -157,7 +145,7 @@ class LifeDisplay:
             if mouse_pos != last_mouse_pos:
                 last_mouse_pos = mouse_pos
                 #print('mouse position', pos)
-                self.infoText.set_entity(self.entities[mouse_pos.y][mouse_pos.x], mouse_pos)
+                self.infoText.set_entity(self.entities[mouse_pos], mouse_pos)
         # end while
 
         pygame.quit()
