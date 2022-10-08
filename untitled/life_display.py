@@ -5,6 +5,8 @@ from info_text import InfoText
 from generation_handler import GenerationHandler
 
 class LifeDisplay:
+    image_save_frequency = 1 * 60 * 1000 # 1 minute
+
     def __init__(self, display_size = (600, 300)):
         pygame.init()
         self.display_size = display_size
@@ -80,6 +82,7 @@ class LifeDisplay:
         self.render_rows((0, self.display_size[0]), (0, self.display_size[1]))
 
         display_count = 0
+        image_count = 0
         while game_running:
             display_count += 1
             self.infoText.set_display_count(display_count)
@@ -129,6 +132,14 @@ class LifeDisplay:
                     pygame.display.update(update_rect)
                 #end def
             #end if
+
+            # save periodic image
+            if pygame.time.get_ticks() > LifeDisplay.image_save_frequency * image_count:
+                filename = 'life-%04d.jpg' % image_count
+                pygame.image.save(self.surface, filename)
+                print('saved %s' % filename)
+                image_count += 1
+            # end if
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
