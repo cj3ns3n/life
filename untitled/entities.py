@@ -31,8 +31,8 @@ class Entity:
         else:
             avg_expectancy = (parents[0].life_expectancy + parents[1].life_expectancy) / 2.0
             avg_factor = (parents[0].initial_health_factor + parents[1].initial_health_factor) / 2.0
-            self.life_expectancy = np.random.normal(avg_expectancy, Entity.health_range)
-            self.initial_health_factor = np.random.normal(avg_factor, Entity.health_range-3)
+            self.life_expectancy = np.random.normal(avg_expectancy, 0.5)
+            self.initial_health_factor = np.random.normal(avg_factor, 0.5)
         # end if
 
         # end if
@@ -136,7 +136,10 @@ class Entities:
     # end def
 
     def __getitem__(self, pos):
-        return self.entities[pos.y][pos.x]
+        try:
+            return self.entities[pos.y][pos.x]
+        except IndexError:
+            print('IndexError: %s' % repr(pos))
     # end def
 
     def get_neighbors(self, pos):
@@ -158,9 +161,9 @@ class Entities:
             return Pos(pos.x-1, pos.y)
         if pos.x < self.size[0] - 1 and not self[Pos(pos.x+1, pos.y)].health > 0: # right neighbor
             return Pos(pos.x+1, pos.y)
-        if pos.x > 0 and not self[Pos(pos.x, pos.y-1)].health > 0: # top neighbor
+        if pos.y > 0 and not self[Pos(pos.x, pos.y-1)].health > 0: # top neighbor
             return Pos(pos.x, pos.y-1)
-        if pos.x < self.size[1] - 1 and not self[Pos(pos.x, pos.y+1)].health > 0: # bottom neighbor
+        if pos.y < self.size[1] - 1 and not self[Pos(pos.x, pos.y+1)].health > 0: # bottom neighbor
             return Pos(pos.x, pos.y+1)
 
         return None
