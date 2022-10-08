@@ -3,6 +3,7 @@ from entity import Entity
 from entity_engine import EntityEngine
 from info_text import InfoText
 from generation_handler import GenerationHandler
+from pos import Pos
 
 class LifeDisplay:
     image_save_frequency = 1 * 60 * 1000 # 1 minute
@@ -77,7 +78,7 @@ class LifeDisplay:
 
     def display(self):
         game_running = True
-        last_mouse_pos = (0,0)
+        last_mouse_pos = Pos(0, 0)
 
         self.render_rows((0, self.display_size[0]), (0, self.display_size[1]))
 
@@ -149,14 +150,15 @@ class LifeDisplay:
                     if event.key == pygame.K_ESCAPE:
                         game_running = False
                         break
-            #end for
+                # end if
+            # end for
 
-            pos = pygame.mouse.get_pos()
-            if pos[0] != last_mouse_pos[0] or pos[1] != last_mouse_pos[1]:
-                last_mouse_pos = pos
+            mouse_pos = Pos(tuple=pygame.mouse.get_pos())
+            if mouse_pos != last_mouse_pos:
+                last_mouse_pos = mouse_pos
                 #print('mouse position', pos)
-                self.infoText.set_entity(self.entities[pos[1]][pos[0]], (pos[0], pos[1]))
-        #end while
+                self.infoText.set_entity(self.entities[mouse_pos.y][mouse_pos.x], mouse_pos)
+        # end while
 
         pygame.quit()
         exit()

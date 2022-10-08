@@ -57,7 +57,7 @@ class InfoText():
     def get_entity_text(self):
         entity_text = 'Entity: None'
         if self.entity:
-            entity_text = 'Entity: (%03d, %03d) %s' % (self.entity_pos[0], self.entity_pos[1], str(self.entity))
+            entity_text = 'Entity: %s %s' % (str(self.entity_pos), str(self.entity))
 
         text = self.font.render(entity_text, True, InfoText.green, InfoText.blue)
         textRect = text.get_rect()
