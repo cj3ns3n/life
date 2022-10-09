@@ -8,6 +8,8 @@ class Entity:
     sexes = ['m', 'f']
     life_expectancy = 100  # number of cycles an entity is expected to live
     initial_health_factor = 20  # less than 20 gives less than 100% birth health.
+    mature_age = 25
+    mature_age_range = 5
 
     def __init__(self, parents=None):
         self.age = 0
@@ -17,9 +19,13 @@ class Entity:
 
         if parents is None:
             self.size = max(0.1, np.random.normal(1, Entity.size_range))
+            self.mature_age = np.random.normal(Entity.mature_age, Entity.mature_age_range)
         else:
             avg_size = (parents[0].size + parents[1].size) / 2.0
             self.size = 0.5 * np.random.normal(avg_size, Entity.size_range)
+
+            avg_mature_age = (parents[0].mature_age + parents[1].mature_age) / 2.0
+            self.mature_age = np.random.normal(avg_mature_age, Entity.mature_age_range)
         # end if
     # end def
 
@@ -42,7 +48,7 @@ class Entity:
         # y=40 log(-x+100)+20  logarithmic decline to 100
         try:
             health = 40 * math.log(-self.age + self.life_expectancy, 10) + self.initial_health_factor
-            live_neighbors = list(filter(lambda entity: entity.health > 0, neighbors))
+            live_neighbors = list(filter(lambda entity: entity is not None and entity.health > 0, neighbors))
             if len(live_neighbors) > 0:
                 local_health = sum(neighbor.health for neighbor in live_neighbors) / len(live_neighbors)
                 health = (health + local_health) / 2
@@ -72,13 +78,15 @@ class Entity:
 
             if 0 < len(live_neighbors) < len(neighbors):
                 return self.procreate(live_neighbors)
-        #end if
+        # end if
     # end def
 
     def procreate(self, neighbors):
-        for neighbor in neighbors:
-            if neighbor.sex != self.sex:
-                return Entity((self, neighbor))
+        if self.age >= Entity.mature_age:
+            for neighbor in neighbors:
+                if neighbor.sex != self.sex and neighbor.age > neighbor.mature_age:
+                    return Entity((self, neighbor))
+        # end if
 
         return None
     # end def
@@ -88,7 +96,7 @@ class Entity:
         self.health = self.calc_health(neighbors)
 
         if self.health > 0:
-            live_neighbors = list(filter(lambda entity: entity.health > 0, neighbors))
+            live_neighbors = list(filter(lambda entity: entity is not None and entity.health > 0, neighbors))
             if len(live_neighbors) > 0:
                 local_size = (sum(neighbor.size for neighbor in live_neighbors) + self.size) / (len(live_neighbors) + 1)
             else:

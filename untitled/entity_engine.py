@@ -20,14 +20,14 @@ class EntityEngine(threading.Thread):
                     pos = Pos(x, y)
                     neighbors = self.entities.get_neighbors(pos)
                     entity = self.entities[pos]
-                    if entity.health > 0:
+                    if entity is not None and entity.health > 0:
                         child = entity.progress(neighbors)
                         #if x == 0 and y == 0:
                         #    print((entity.age, entity.health, entity.initial_health_factor, entity.life_expectancy))
                         if not entity.health > 0:
                             self.generation_handler.increment_deaths()
                         if child:
-                            new_pos = self.entities.get_dead_neighbor_pos(pos)
+                            new_pos = self.entities.get_vacant_neighbor_pos(pos)
                             if new_pos:
                                 #print('dead: %s' % (str(self.entities[new_pos[1]][new_pos[0]])))
                                 self.entities[new_pos] = child

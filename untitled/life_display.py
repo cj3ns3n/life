@@ -36,7 +36,7 @@ class LifeDisplay:
     def entity_color(self, entity):
         r = g = b = 0
 
-        if entity.health > 0:
+        if entity is not None and entity.health > 0:
             if self.show_age:
                 if entity.age > self.max_age:
                     self.max_age = entity.age
@@ -92,8 +92,6 @@ class LifeDisplay:
                 pygame.display.flip()
             else:
                 # refresh updated entities
-                max_row = 0
-                min_row = 0
                 updated_rows = self.handler.get_processed_rows()
                 if len(updated_rows) > 0:
                     max_row = max(updated_rows)

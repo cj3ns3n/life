@@ -1,20 +1,24 @@
 from pos import Pos
 from entity import Entity
+import random
 
 class Entities:
-    def __init__(self, size):
+    def __init__(self, size, life_likelyhood=75):
         self.size = size
         self.width = size[0]
         self.height = size[1]
-        self.entities = self.birth_entities(size)
+        self.entities = self.birth_entities(size, life_likelyhood)
     # end def
 
-    def birth_entities(self, size):
+    def birth_entities(self, size, life_likelyhood):
         entities = []
         for y in range(size[1]):
             row = []
             for x in range(size[0]):
-                row.append(Entity())
+                if random.randint(0,100) < life_likelyhood:
+                    row.append(Entity())
+                else:
+                    row.append(None)
             entities.append(row)
         # end for
 
@@ -46,15 +50,26 @@ class Entities:
         return neighbors
     # end def
 
-    def get_dead_neighbor_pos(self, pos):
-        if pos.x > 0 and not self[Pos(pos.x-1, pos.y)].health > 0: # left neighbor
-            return Pos(pos.x-1, pos.y)
-        if pos.x < self.size[0] - 1 and not self[Pos(pos.x+1, pos.y)].health > 0: # right neighbor
-            return Pos(pos.x+1, pos.y)
-        if pos.y > 0 and not self[Pos(pos.x, pos.y-1)].health > 0: # top neighbor
-            return Pos(pos.x, pos.y-1)
-        if pos.y < self.size[1] - 1 and not self[Pos(pos.x, pos.y+1)].health > 0: # bottom neighbor
-            return Pos(pos.x, pos.y+1)
+    def get_vacant_neighbor_pos(self, pos):
+        if pos.x > 0: # left neighbor
+            left_neighbor = self[Pos(pos.x-1, pos.y)]
+            if left_neighbor is None or not left_neighbor.health > 0:
+                return Pos(pos.x-1, pos.y)
+
+        if pos.x < self.size[0] - 1: # right neighbor
+            right_neighbor =  self[Pos(pos.x+1, pos.y)]
+            if right_neighbor is None or not right_neighbor.health > 0:
+                return Pos(pos.x+1, pos.y)
+
+        if pos.y > 0: # top neighbor
+            top_neighbor = self[Pos(pos.x, pos.y-1)]
+            if top_neighbor is None or not top_neighbor.health > 0:
+                return Pos(pos.x, pos.y-1)
+
+        if pos.y < self.size[1] - 1: # bottom neighbor
+            bottom_neighbor =  self[Pos(pos.x, pos.y+1)]
+            if bottom_neighbor is None or not bottom_neighbor.health > 0:
+                return Pos(pos.x, pos.y+1)
 
         return None
     # end def
