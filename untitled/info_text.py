@@ -7,10 +7,7 @@ class InfoText():
     def __init__(self):
         self.font = pygame.font.Font(None, 18)
 
-        self.generation = 0
         self.display_count = 0
-        self.births = 0
-        self.deaths = 0
         self.entity = None
         self.rect = pygame.Rect(0, 0, 0, 0)
     # end def
@@ -45,22 +42,13 @@ class InfoText():
         return self.rect
     # end def
 
-    def set_generation(self, generation):
-        self.generation = generation
-
     def get_cycles_text(self, engine):
-        text = self.font.render('Generation %d' % self.generation, True, InfoText.green, InfoText.blue)
+        text = self.font.render('Cycles %d' % engine.cycles, True, InfoText.green, InfoText.blue)
         textRect = text.get_rect()
         textRect.topleft = (10, 10)
 
         return text
     # end def
-
-    def set_deaths(self, death_count):
-        self.deaths = death_count
-
-    def set_births(self, birth_count):
-        self.births = birth_count
 
     def get_census_text(self, engine):
         text = self.font.render('Births: %02d; Deaths: %02d; Avg Age: %.1f, Stdv Age: %.1f, Avg Health: %.1f, Stdv Health: %.1f, Avg Size: %.1f, Stdv Size: %.1f'

@@ -2,7 +2,6 @@ import pygame
 from entities import Entities
 from entity_engine import EntityEngine
 from info_text import InfoText
-from generation_handler import GenerationHandler
 from pos import Pos
 
 class LifeDisplay:
@@ -17,8 +16,7 @@ class LifeDisplay:
 
         self.infoText = InfoText()
 
-        self.handler = GenerationHandler(self.infoText)
-        self.engine = EntityEngine(self.entities, self.handler)
+        self.engine = EntityEngine(self.entities)
         self.engine.daemon = True
         self.engine.start()
 
@@ -92,7 +90,7 @@ class LifeDisplay:
                 pygame.display.flip()
             else:
                 # refresh updated entities
-                updated_rows = self.handler.get_processed_rows()
+                updated_rows = self.engine.get_processed_rows()
                 if len(updated_rows) > 0:
                     max_row = max(updated_rows)
                     min_row = min(updated_rows)

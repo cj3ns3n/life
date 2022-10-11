@@ -3,11 +3,12 @@ import statistics
 from pos import Pos
 
 class EntityEngine(threading.Thread):
-    def __init__(self, entities, generation_handler):
+    def __init__(self, entities):
         threading.Thread.__init__(self)
 
         self.entities = entities
-        self.generation_handler = generation_handler
+
+        self.processed_rows = []
 
         # stats
         self.cycles = 0
@@ -21,13 +22,16 @@ class EntityEngine(threading.Thread):
         self.size_stdv = 0
     # end def
 
+    def get_processed_rows(self):
+        rows = self.processed_rows.copy()
+        self.processed_rows = []
+        return rows
+    # end def
+
     def run(self) :
-        generationCount = 0
-        self.cycles = generationCount
+        self.cycles = 0
         while True:
             #print('progressing', count)
-            generationCount += 1
-            self.generation_handler.set_generation(generationCount)
             ages = []
             healths = []
             sizes = []
@@ -42,7 +46,6 @@ class EntityEngine(threading.Thread):
                         #if x == 0 and y == 0:
                         #    print((entity.age, entity.health, entity.initial_health_factor, entity.life_expectancy))
                         if not entity.health > 0:
-                            self.generation_handler.increment_deaths()
                             self.deaths += 1
                         else:
                             ages.append(entity.age)
@@ -56,12 +59,11 @@ class EntityEngine(threading.Thread):
                                 self.births += 1
                                 #print('dead: %s' % (str(self.entities[new_pos[1]][new_pos[0]])))
                                 self.entities[new_pos] = child
-                                self.generation_handler.increment_births()
                             # end if
                         # end if
                     # end if
                 # end for x
-                self.generation_handler.row_progressed(y)
+                self.processed_rows.append(y)
             # end for y
 
             self.cycles += 1
