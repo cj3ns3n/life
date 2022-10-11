@@ -35,6 +35,7 @@ class EntityEngine(threading.Thread):
             ages = []
             healths = []
             sizes = []
+            stats_thread = None
 
             for y in range(self.entities.height):
                 for x in range(self.entities.width):
@@ -67,12 +68,22 @@ class EntityEngine(threading.Thread):
             # end for y
 
             self.cycles += 1
-            self.age_avg = statistics.mean(ages)
-            self.age_stdv = statistics.stdev(ages)
-            self.health_avg = statistics.mean(healths)
-            self.health_stdv = statistics.stdev(healths)
-            self.size_avg = statistics.mean(sizes)
-            self.size_stdv = statistics.stdev(sizes)
+
+            if stats_thread is None or not stats_thread.is_alive():
+                print('stats thread')
+                stats_thread = threading.Thread(target=self.calc_stats, args=(ages, healths, sizes))
+                stats_thread.start ()
+                stats_thread.join ()
         # end while
     # end def
+
+    def calc_stats(self, ages, healths, sizes):
+        self.age_avg = statistics.mean(ages)
+        self.age_stdv = statistics.stdev(ages)
+        self.health_avg = statistics.mean(healths)
+        self.health_stdv = statistics.stdev(healths)
+        self.size_avg = statistics.mean(sizes)
+        self.size_stdv = statistics.stdev(sizes)
+    # end def
+
 # end class
