@@ -15,13 +15,13 @@ class InfoText():
         self.rect = pygame.Rect(0, 0, 0, 0)
     # end def
 
-    def blit(self, surface):
-        gen_text = self.get_generation_text()
+    def blit(self, surface, engine):
+        gen_text = self.get_cycles_text(engine)
         gen_text_rec = gen_text.get_rect()
         gen_text_rec.topleft = (10, 10)
         surface.blit(gen_text, gen_text_rec)
 
-        births_text = self.get_census_text()
+        births_text = self.get_census_text(engine)
         births_text_rec = births_text.get_rect()
         births_text_rec.topleft = (10, 20)
         surface.blit(births_text, births_text_rec)
@@ -48,7 +48,7 @@ class InfoText():
     def set_generation(self, generation):
         self.generation = generation
 
-    def get_generation_text(self):
+    def get_cycles_text(self, engine):
         text = self.font.render('Generation %d' % self.generation, True, InfoText.green, InfoText.blue)
         textRect = text.get_rect()
         textRect.topleft = (10, 10)
@@ -62,8 +62,9 @@ class InfoText():
     def set_births(self, birth_count):
         self.births = birth_count
 
-    def get_census_text(self):
-        text = self.font.render('Births: %02d; Deaths: %02d' % (self.births, self.deaths), True, InfoText.green, InfoText.blue)
+    def get_census_text(self, engine):
+        text = self.font.render('Births: %02d; Deaths: %02d; Avg Age: %.1f, Stdv Age: %.1f, Avg Health: %.1f, Stdv Health: %.1f, Avg Size: %.1f, Stdv Size: %.1f'
+                                % (engine.births, engine.deaths, engine.age_avg, engine.age_stdv, engine.health_avg, engine.health_stdv, engine.size_avg, engine.size_stdv), True, InfoText.green, InfoText.blue)
         textRect = text.get_rect()
         textRect.topleft = (10, 20)
 

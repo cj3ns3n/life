@@ -86,7 +86,7 @@ class LifeDisplay:
         while game_running:
             display_count += 1
             self.infoText.set_display_count(display_count)
-            self.infoText.blit(self.surface)
+            self.infoText.blit(self.surface, self.engine)
 
             if display_count <= 1:
                 pygame.display.flip()
