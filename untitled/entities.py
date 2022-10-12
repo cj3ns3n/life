@@ -47,7 +47,7 @@ class Entities:
         if pos.y < self.height - 1:  # bottom neighbor
             neighbors.append(self[Pos(pos.x, pos.y+1)])
 
-        return neighbors
+        return list(filter(lambda n: n is not None and n.health > 0.0, neighbors))
     # end def
 
     def get_vacant_neighbor_pos(self, pos):

@@ -68,7 +68,11 @@ class LifeDisplay:
             for y in range(y_range[0], y_range[1]):
                 entity = self.entities[Pos(x, y)]
                 entity_rect = pygame.Rect(x, y, 1, 1)
-                pygame.draw.rect(self.surface, self.entity_color(entity), entity_rect)
+                try:
+                    pygame.draw.rect(self.surface, self.entity_color(entity), entity_rect)
+                except ValueError:
+                    print(repr(entity))
+                    raise
             # end for
         # end for
     # end def

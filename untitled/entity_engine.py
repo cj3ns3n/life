@@ -46,13 +46,19 @@ class EntityEngine(threading.Thread):
                         child = entity.progress(neighbors)
                         #if x == 0 and y == 0:
                         #    print((entity.age, entity.health, entity.initial_health_factor, entity.life_expectancy))
-                        if not entity.health > 0:
-                            self.deaths += 1
-                        else:
+                        if entity.health > 0:
                             ages.append(entity.age)
                             healths.append(entity.health)
                             sizes.append(entity.size)
+                        else:
+                            self.deaths += 1
                         # end def
+
+                        # check if any neighbors died
+                        if len(list(filter(lambda neighbor: not neighbor.health > 0, neighbors))):
+                            #print('neighbor died')
+                            self.deaths += 1
+
 
                         if child:
                             new_pos = self.entities.get_vacant_neighbor_pos(pos)
@@ -70,7 +76,6 @@ class EntityEngine(threading.Thread):
             self.cycles += 1
 
             if stats_thread is None or not stats_thread.is_alive():
-                print('stats thread')
                 stats_thread = threading.Thread(target=self.calc_stats, args=(ages, healths, sizes))
                 stats_thread.start ()
                 stats_thread.join ()
