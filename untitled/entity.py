@@ -22,7 +22,7 @@ class Entity:
             self.mature_age = np.random.normal(Entity.mature_age, Entity.mature_age_range)
         else:
             avg_size = (parents[0].size + parents[1].size) / 2.0
-            self.size = 0.5 * np.random.normal(avg_size, Entity.size_range)
+            self.size = np.random.normal(avg_size, Entity.size_range)
 
             avg_mature_age = (parents[0].mature_age + parents[1].mature_age) / 2.0
             self.mature_age = np.random.normal(avg_mature_age, Entity.mature_age_range)
