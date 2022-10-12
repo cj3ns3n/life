@@ -28,7 +28,7 @@ class EntityEngine(threading.Thread):
         return rows
     # end def
 
-    def run(self) :
+    def run(self):
         self.cycles = 0
         while True:
             #print('progressing', count)
