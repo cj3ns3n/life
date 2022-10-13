@@ -40,20 +40,24 @@ class LifeDisplay:
                 r = entity.phenotype[0]
                 g = entity.phenotype[1]
                 b = entity.phenotype[2]
-            elif self.show_age:
-                if entity.age > self.max_age:
-                    self.max_age = entity.age
-                r = int(255.0 * entity.age / self.max_age)
-            elif self.show_health:
-                if entity.health < self.min_health:
-                    self.min_health = entity.health
-                g = int(255.0 * (entity.health - self.min_health) / (self.max_health - self.min_health))
-            elif self.show_size:
-                if entity.size > self.max_size:
-                    self.max_size = entity.size
-                if entity.size < self.min_size:
-                    self.min_size = entity.size
-                b = int(255.0 * (entity.size - self.min_size) / (self.max_size - self.min_size))
+            else:
+                if self.show_age:
+                    if entity.age > self.max_age:
+                        self.max_age = entity.age
+                    r = int(255.0 * entity.age / self.max_age)
+
+                if self.show_health:
+                    if entity.health < self.min_health:
+                        self.min_health = entity.health
+                    g = int(255.0 * (entity.health - self.min_health) / (self.max_health - self.min_health))
+
+                if self.show_size:
+                    if entity.size > self.max_size:
+                        self.max_size = entity.size
+                    if entity.size < self.min_size:
+                        self.min_size = entity.size
+                    b = int(255.0 * (entity.size - self.min_size) / (self.max_size - self.min_size))
+                # end if
             # end if
 
             if r < 0 or r > 255 or g < 0 or g > 255 or b < 0 or b > 255:
