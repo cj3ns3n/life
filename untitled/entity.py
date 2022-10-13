@@ -11,6 +11,7 @@ class Entity:
     sexes = ['f', 'm']
     health_range = 5
     size_range = 1
+    phenotype_range = 1
     life_expectancy = 100  # number of cycles an entity is expected to live
     initial_health_factor = 20  # less than 20 gives less than 100% birth health.
     mature_age = 25
@@ -28,9 +29,19 @@ class Entity:
         if parents is None:
             self.size = max(0.1, np.random.normal(1, Entity.size_range))
             self.mature_age = np.random.normal(Entity.mature_age, Entity.mature_age_range)
+            self.phenotype = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         else:
             avg_size = (parents[0].size + parents[1].size) / 2.0
             self.size = np.random.normal(avg_size, Entity.size_range)
+
+            # avg phenotype values
+            a = (parents[0].phenotype[0] + parents[1].phenotype[0]) / 2.0
+            a = np.random.normal(a, Entity.phenotype_range)
+            b = (parents[0].phenotype[1] + parents[1].phenotype[1]) / 2.0
+            b = np.random.normal(b, Entity.phenotype_range)
+            c = (parents[0].phenotype[2] + parents[1].phenotype[2]) / 2.0
+            c = np.random.normal(c, Entity.phenotype_range)
+            self.phenotype = (min(255, max(0, a)), min(255, max(0, b)), min(255, max(0, c)))
 
             avg_mature_age = (parents[0].mature_age + parents[1].mature_age) / 2.0
             self.mature_age = np.random.normal(avg_mature_age, Entity.mature_age_range)
