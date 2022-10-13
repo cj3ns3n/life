@@ -81,7 +81,18 @@ class LifeDisplay:
         # end for
     # end def
 
+    def print_keys(self):
+        print('Key Commands:')
+        print('\tESC\t- Close program')
+        print('\ta\t- Toggle display of age as a color')
+        print('\th\t- Toggle display of health as a color')
+        print('\ts\t- Toggle display of size as a color')
+        print('\tp\t- Toggle display of phenotype color; overrides other entity colors')
+    # end def
+
     def display(self):
+        self.print_keys()
+        
         game_running = True
         last_mouse_pos = Pos(0, 0)
 
@@ -120,7 +131,7 @@ class LifeDisplay:
             if pygame.time.get_ticks() > LifeDisplay.image_save_frequency * image_count:
                 filename = 'life-%04d.jpg' % image_count
                 pygame.image.save(self.surface, filename)
-                print('saved %s' % filename)
+                #print('saved %s' % filename)
                 image_count += 1
             # end if
 
