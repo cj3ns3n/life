@@ -62,13 +62,19 @@ class EntityEngine(threading.Thread):
                             self.deaths += 1
 
 
-                        if child:
-                            vacant_positions = self.entities.get_vacant_neighbor_positions(pos)
-                            if len(vacant_positions) > 0:
+                        vacant_positions = self.entities.get_vacant_neighbor_positions(pos)
+                        if len(vacant_positions) > 0:
+                            if child:
                                 new_pos = random.choice(vacant_positions)
                                 self.births += 1
                                 #print('dead: %s' % (str(self.entities[new_pos[1]][new_pos[0]])))
                                 self.entities[new_pos] = child
+                            else:
+                                # no child born move to new location
+                                if entity.age > entity.mature_age:
+                                    new_pos = random.choice(vacant_positions)
+                                    self.entities[new_pos] = entity
+                                    self.entities[pos] = None
                             # end if
                         # end if
                     # end if

@@ -3,7 +3,7 @@ from entity import Entity
 import random
 
 class Entities:
-    def __init__(self, size, life_likelyhood=10):
+    def __init__(self, size, life_likelyhood=0.05):
         self.size = size
         self.width = size[0]
         self.height = size[1]
@@ -15,7 +15,7 @@ class Entities:
         for y in range(size[1]):
             row = []
             for x in range(size[0]):
-                if random.randint(0,100) < life_likelyhood:
+                if random.random() < life_likelyhood:
                     row.append(Entity())
                 else:
                     row.append(None)
