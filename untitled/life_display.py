@@ -67,6 +67,18 @@ class LifeDisplay:
         return (r, g, b)
     # end def
 
+    def render_row(self, row_idx):
+        for x in range(0, self.display_size[0]):
+            entity = self.entities[Pos(x, row_idx)]
+            entity_rect = pygame.Rect(x, row_idx, 1, 1)
+            try:
+                pygame.draw.rect(self.surface, self.entity_color(entity), entity_rect)
+            except ValueError:
+                print(repr(entity))
+                raise
+        # end for
+    # end def
+
     def render_rows(self, x_range, y_range):
         for x in range(x_range[0], x_range[1]):
             for y in range(y_range[0], y_range[1]):
@@ -110,15 +122,12 @@ class LifeDisplay:
             else:
                 # refresh updated entities
                 updated_rows = self.engine.get_processed_rows()
-                if len(updated_rows) > 0:
-                    max_row = max(updated_rows)
-                    min_row = min(updated_rows)
-
-                    self.render_rows((0, self.display_size[0]), (min_row, max_row + 1))
+                for updated_row in updated_rows:
+                    self.render_row(updated_row)
 
                     width = self.display_size[0]
-                    height = max_row - min_row + 1
-                    update_rect = pygame.Rect(0, min(updated_rows), width, height)
+                    height = 1
+                    update_rect = pygame.Rect(0, updated_row, width, height)
                     #print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
                     #print(update_rect)
                     pygame.display.update(update_rect)

@@ -38,8 +38,13 @@ class EntityEngine(threading.Thread):
             sizes = []
             stats_thread = None
 
-            for y in range(self.entities.height):
-                for x in range(self.entities.width):
+            # shuffle the processing of rows and columns to avoid bias artifacts
+            y_positions = list(range(self.entities.height))
+            random.shuffle(y_positions)
+            for y in y_positions:
+                x_positions = list(range(self.entities.width))
+                random.shuffle(x_positions)
+                for x in x_positions:
                     pos = Pos(x, y)
                     neighbors = self.entities.get_neighbors(pos)
                     random.shuffle(neighbors)
