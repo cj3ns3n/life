@@ -1,5 +1,6 @@
 import threading
 import statistics
+import random
 from pos import Pos
 
 class EntityEngine(threading.Thread):
@@ -41,6 +42,7 @@ class EntityEngine(threading.Thread):
                 for x in range(self.entities.width):
                     pos = Pos(x, y)
                     neighbors = self.entities.get_neighbors(pos)
+                    random.shuffle(neighbors)
                     entity = self.entities[pos]
                     if entity is not None and entity.health > 0:
                         child = entity.progress(neighbors)
@@ -61,8 +63,9 @@ class EntityEngine(threading.Thread):
 
 
                         if child:
-                            new_pos = self.entities.get_vacant_neighbor_pos(pos)
-                            if new_pos:
+                            vacant_positions = self.entities.get_vacant_neighbor_positions(pos)
+                            if len(vacant_positions) > 0:
+                                new_pos = random.choice(vacant_positions)
                                 self.births += 1
                                 #print('dead: %s' % (str(self.entities[new_pos[1]][new_pos[0]])))
                                 self.entities[new_pos] = child

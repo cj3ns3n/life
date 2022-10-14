@@ -50,27 +50,29 @@ class Entities:
         return list(filter(lambda n: n is not None and n.health > 0.0, neighbors))
     # end def
 
-    def get_vacant_neighbor_pos(self, pos):
+    def get_vacant_neighbor_positions(self, pos):
+        positions = []
+
         if pos.x > 0: # left neighbor
             left_neighbor = self[Pos(pos.x-1, pos.y)]
             if left_neighbor is None or not left_neighbor.health > 0:
-                return Pos(pos.x-1, pos.y)
+                positions.append(Pos(pos.x-1, pos.y))
 
         if pos.x < self.size[0] - 1: # right neighbor
             right_neighbor =  self[Pos(pos.x+1, pos.y)]
             if right_neighbor is None or not right_neighbor.health > 0:
-                return Pos(pos.x+1, pos.y)
+                positions.append(Pos(pos.x+1, pos.y))
 
         if pos.y > 0: # top neighbor
             top_neighbor = self[Pos(pos.x, pos.y-1)]
             if top_neighbor is None or not top_neighbor.health > 0:
-                return Pos(pos.x, pos.y-1)
+                positions.append(Pos(pos.x, pos.y-1))
 
         if pos.y < self.size[1] - 1: # bottom neighbor
             bottom_neighbor =  self[Pos(pos.x, pos.y+1)]
             if bottom_neighbor is None or not bottom_neighbor.health > 0:
-                return Pos(pos.x, pos.y+1)
+                positions.append(Pos(pos.x, pos.y+1))
 
-        return None
+        return positions
     # end def
 # end class
