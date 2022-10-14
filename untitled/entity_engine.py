@@ -71,7 +71,7 @@ class EntityEngine(threading.Thread):
                                 self.entities[new_pos] = child
                             else:
                                 # no child born move to new location
-                                if entity.age > entity.mature_age:
+                                if entity.age > entity.mature_age and entity.health > 50:
                                     new_pos = random.choice(vacant_positions)
                                     self.entities[new_pos] = entity
                                     self.entities[pos] = None
