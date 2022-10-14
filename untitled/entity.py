@@ -7,8 +7,13 @@ import numpy.random
 
 class Entity:
     FEMALE = 'f'
-    MALE = 'm'
-    sexes = ['f', 'm']
+    MALE   = 'm'
+
+    NORTH  = 'n'
+    SOUTH  = 's'
+    EAST   = 'e'
+    WEST   = 'w'
+
     health_range = 5
     size_range = 1
     phenotype_range = 1
@@ -22,7 +27,8 @@ class Entity:
 
     def __init__(self, parents=None):
         self.age = 0
-        self.sex = random.choice(Entity.sexes)
+        self.sex = random.choice([Entity.MALE, Entity.FEMALE])
+        self.preferred_direction = random.choice([Entity.NORTH, Entity.SOUTH, Entity.EAST, Entity.WEST])
 
         self.health = self.get_initial_health(parents)
 

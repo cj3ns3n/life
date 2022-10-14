@@ -2,6 +2,8 @@ import threading
 import statistics
 import random
 from pos import Pos
+from entity import Entity
+
 
 class EntityEngine(threading.Thread):
     def __init__(self, entities):
@@ -27,6 +29,31 @@ class EntityEngine(threading.Thread):
         rows = self.processed_rows.copy()
         self.processed_rows = []
         return rows
+    # end def
+
+    def get_vacant_position(self, pos, preferred_dir):
+        vacant_positions = self.entities.get_vacant_neighbor_positions(pos)
+        if len(vacant_positions) > 0:
+            if preferred_dir == Entity.NORTH:
+                north_loc = Pos(pos.x, pos.y - 1)
+                if north_loc in vacant_positions:
+                    return north_loc
+            elif preferred_dir == Entity.SOUTH:
+                south_loc = Pos(pos.x, pos.y + 1)
+                if south_loc in vacant_positions:
+                    return south_loc
+            elif preferred_dir == Entity.WEST:
+                west_loc = Pos(pos.x - 1, pos.y)
+                if west_loc in vacant_positions:
+                    return west_loc
+            elif preferred_dir == Entity.EAST:
+                east_loc = Pos(pos.x + 1, pos.y)
+                if east_loc in vacant_positions:
+                    return east_loc
+            else:
+                return random.choice(vacant_positions)
+        else:
+            return None
     # end def
 
     def run(self):
@@ -66,21 +93,16 @@ class EntityEngine(threading.Thread):
                             #print('neighbor died')
                             self.deaths += 1
 
-
-                        vacant_positions = self.entities.get_vacant_neighbor_positions(pos)
-                        if len(vacant_positions) > 0:
-                            if child:
-                                new_pos = random.choice(vacant_positions)
+                        if child:
+                            new_pos = self.get_vacant_position(pos, entity.preferred_direction)
+                            if new_pos:
                                 self.births += 1
-                                #print('dead: %s' % (str(self.entities[new_pos[1]][new_pos[0]])))
                                 self.entities[new_pos] = child
-                            else:
-                                # no child born move to new location
-                                if entity.age > entity.mature_age and entity.health > 50:
-                                    new_pos = random.choice(vacant_positions)
-                                    self.entities[new_pos] = entity
-                                    self.entities[pos] = None
-                            # end if
+                        elif entity.age > entity.mature_age and entity.health > 50:
+                            new_pos = self.get_vacant_position(pos, entity.preferred_direction)
+                            if new_pos:
+                                self.entities[new_pos] = entity
+                                self.entities[pos] = None
                         # end if
                     # end if
                 # end for x
