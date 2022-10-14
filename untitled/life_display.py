@@ -44,7 +44,7 @@ class LifeDisplay:
                 if self.show_age:
                     if entity.age > self.max_age:
                         self.max_age = entity.age
-                    r = int(255.0 * entity.age / self.max_age)
+                    r = int(255.0 * 1.0 - (entity.age / self.max_age))
 
                 if self.show_health:
                     if entity.health < self.min_health:
