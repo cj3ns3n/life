@@ -80,17 +80,8 @@ class LifeDisplay:
     # end def
 
     def render_rows(self, x_range, y_range):
-        for x in range(x_range[0], x_range[1]):
-            for y in range(y_range[0], y_range[1]):
-                entity = self.entities[Pos(x, y)]
-                entity_rect = pygame.Rect(x, y, 1, 1)
-                try:
-                    pygame.draw.rect(self.surface, self.entity_color(entity), entity_rect)
-                except ValueError:
-                    print(repr(entity))
-                    raise
-            # end for
-        # end for
+        for y in range(y_range[0], y_range[1]):
+            self.render_row(y)
     # end def
 
     def print_keys(self):
