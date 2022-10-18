@@ -1,5 +1,8 @@
 import statistics
 
+from entity import Entity
+
+
 class StatsContainer:
     def __init__(self):
         self.ages = []
@@ -15,6 +18,8 @@ class StatsContainer:
 
         self.cycles = 0
         self.births_count = 0
+        self.males_count = 0
+        self.female_count = 0
         self.natural_deaths = 0
         self.maternal_deaths = 0
         self.display_iterations = 0
@@ -32,6 +37,8 @@ class StatsContainer:
         stats['births'] = self.births_count
         stats['natural_deaths'] = self.natural_deaths
         stats['maternal_deaths'] = self.maternal_deaths
+        stats['males'] = self.males_count
+        stats['females'] = self.female_count
         stats['cycles'] = self.cycles
         stats['display_iterations'] = self.display_iterations
 
@@ -68,12 +75,21 @@ class StatsContainer:
     def increment_cycles(self):
         self.cycles += 1
 
-    def increment_births(self):
+    def increment_births(self, baby):
         self.births_count += 1
+        if baby.sex == Entity.MALE:
+            self.males_count += 1
+        else:
+            self.female_count += 1
 
-    def increment_natural_deaths(self):
+    def increment_natural_deaths(self, entity):
         self.natural_deaths += 1
+        if entity.sex == Entity.MALE:
+            self.males_count -= 1
+        else:
+            self.female_count -= 1
 
     def increment_maternal_deaths(self):
         self.maternal_deaths += 1
+        self.female_count -= 1
 # end class

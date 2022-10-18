@@ -23,7 +23,8 @@ class InfoText():
         surface.blit(gen_text, gen_text_rec)
         y_loc += gen_text_rec.height
 
-        pop_text = self.font.render('Population %d' % (stats['births'] - stats['maternal_deaths'] - stats['natural_deaths']), True, InfoText.green, InfoText.blue)
+        pop_text_str = 'Population %03d; Males %03d; Females %03d' % (stats['births'] - stats['maternal_deaths'] - stats['natural_deaths'], stats['males'], stats['females'])
+        pop_text = self.font.render(pop_text_str, True, InfoText.green, InfoText.blue)
         pop_text_rec = pop_text.get_rect()
         pop_text_rec.topleft = (10, y_loc)
         surface.blit(pop_text, pop_text_rec)

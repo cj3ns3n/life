@@ -85,7 +85,7 @@ class EntityEngine(threading.Thread):
                 if best_mate:
                     child = Entity((entity, best_mate))
                     self.entities[new_pos] = child
-                    self.stats.increment_births()
+                    self.stats.increment_births(child)
 
                     # adjust female parent health
                     female_parent = entity if entity.sex == Entity.FEMALE else best_mate
@@ -129,7 +129,7 @@ class EntityEngine(threading.Thread):
                     if entity is not None and entity.health > 0:
                         if self.stats.cycles == 0:
                             # add initial entities to births
-                            self.stats.increment_births()
+                            self.stats.increment_births(entity)
                         # end if
 
                         entity.progress(neighbors)
@@ -137,7 +137,7 @@ class EntityEngine(threading.Thread):
                             self.stats.add_entity_stats(entity)
                             self.post_entity_progress(pos, entity, neighbors)
                         else:
-                            self.stats.increment_natural_deaths()
+                            self.stats.increment_natural_deaths(entity)
                         # end if
                     # end if
                 # end for x

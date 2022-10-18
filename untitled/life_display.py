@@ -32,7 +32,7 @@ class LifeDisplay:
         self.show_age = True
         self.show_health = True
         self.show_sex = True
-    #end def
+    # end def
 
     def entity_color(self, entity):
         r = g = b = 0
