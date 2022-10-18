@@ -3,7 +3,7 @@ from entity import Entity
 import random
 
 class Entities:
-    def __init__(self, size, life_likelyhood=0.1):
+    def __init__(self, size, life_likelyhood=0.05):
         self.size = size
         self.width = size[0]
         self.height = size[1]
