@@ -60,15 +60,19 @@ class EntityEngine(threading.Thread):
             best_dist = 10000
             for neighbor in neighbors:
                 if neighbor.sex != entity.sex and neighbor.age >= neighbor.mature_age:
-                    p_dis = self.entity_dist(entity, neighbor)
-                    if p_dis < best_dist:
-                        best_dist = p_dis
+                    dist = self.entity_dist(entity, neighbor)
+                    if dist < best_dist:
+                        best_dist = dist
                         best_mate = neighbor
                 # end if
             # end for
         # end if
 
         return best_mate
+    # end def
+
+    def child_exists(self, neighbors):
+        return len(list(filter(lambda entity: entity.age >= entity.mature_age, neighbors))) > 0
     # end def
 
     def post_entity_progress(self, pos, entity, neighbors):
@@ -94,7 +98,7 @@ class EntityEngine(threading.Thread):
                     # end if
 
                     return child
-                elif len(neighbors) < 2:
+                elif not self.child_exists(neighbors) and len(neighbors) < 2:
                     # find new pos
                     self.entities[new_pos] = entity
                     self.entities[pos] = None
