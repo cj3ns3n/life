@@ -1,6 +1,7 @@
 import pygame
 from entities import Entities
 from entity_engine import EntityEngine
+from stats_container import StatsContainer
 from info_text import InfoText
 from pos import Pos
 
@@ -14,9 +15,10 @@ class LifeDisplay:
 
         self.entities = Entities(display_size)
 
+        self.stats = StatsContainer()
         self.infoText = InfoText()
 
-        self.engine = EntityEngine(self.entities)
+        self.engine = EntityEngine(self.entities, self.stats)
         self.engine.daemon = True
         self.engine.start()
 
@@ -101,15 +103,14 @@ class LifeDisplay:
 
         self.render_rows((0, self.display_size[0]), (0, self.display_size[1]))
 
-        display_count = 0
         image_count = 0
+        first = True
         while game_running:
-            display_count += 1
-            self.infoText.set_display_count(display_count)
-            self.infoText.blit(self.surface, self.engine)
+            self.infoText.blit(self.surface, self.stats)
 
-            if display_count <= 1:
+            if first:
                 pygame.display.flip()
+                first = False
             else:
                 # refresh updated entities
                 updated_rows = self.engine.get_processed_rows()
@@ -134,6 +135,8 @@ class LifeDisplay:
                 #print('saved %s' % filename)
                 image_count += 1
             # end if
+
+            self.stats.increment_display_iterations()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

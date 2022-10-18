@@ -13,40 +13,47 @@ class InfoText():
         self.rect = pygame.Rect(0, 0, 0, 0)
     # end def
 
-    def blit(self, surface, engine):
+    def blit(self, surface, stats_container):
         y_loc = InfoText.initial_y_loc
+        stats = stats_container.get_stats()
 
-        gen_text = self.get_cycles_text(engine)
+        gen_text = self.font.render('Cycles %d' % stats['cycles'], True, InfoText.green, InfoText.blue)
         gen_text_rec = gen_text.get_rect()
         gen_text_rec.topleft = (10, y_loc)
         surface.blit(gen_text, gen_text_rec)
         y_loc += gen_text_rec.height
 
-        births_text = self.get_births_stats(engine)
+        births = stats['births']
+        m_deaths = stats['maternal_deaths']
+        n_deaths = stats['natural_deaths']
+        m_deathrate = 100.0 * float(m_deaths) / float(births) if births > 0 else 0.0
+        n_deathrate = 100.0 * float(n_deaths) / float(births) if births > 0 else 0.0  # skewed because initial spawned entities are not in the birth count
+        births_text_str = 'Births: %02d; Maternal Deaths: %02d (rate: %0.1f%%); Natural Deaths: %02d (rate: %0.1f%%)' % (births, m_deaths, m_deathrate, n_deaths, n_deathrate)
+        births_text = self.font.render(births_text_str, True, InfoText.green, InfoText.blue)
         births_text_rec = births_text.get_rect()
         births_text_rec.topleft = (10, y_loc)
         surface.blit(births_text, births_text_rec)
         y_loc += births_text_rec.height
 
-        age_text = self.get_age_stats(engine)
+        age_text = self.font.render('Avg Age: %.1f, Stdv Age: %.1f' % (stats['age_avg'], stats['age_stdev']), True, InfoText.green, InfoText.blue)
         age_text_rec = age_text.get_rect()
         age_text_rec.topleft = (10, y_loc)
         surface.blit(age_text, age_text_rec)
         y_loc += age_text_rec.height
 
-        health_text = self.get_health_stats(engine)
+        health_text = self.font.render('Avg Health: %.1f, Stdv Health: %.1f' % (stats['health_avg'], stats['health_stdev']), True, InfoText.green, InfoText.blue)
         health_text_rec = health_text.get_rect()
         health_text_rec.topleft = (10, y_loc)
         surface.blit(health_text, health_text_rec)
         y_loc += health_text_rec.height
 
-        size_text = self.get_size(engine)
+        size_text = self.font.render('Avg Size: %.1f, Stdv Size: %.1f' % (stats['size_avg'], stats['size_stdev']), True, InfoText.green, InfoText.blue)
         size_text_rec = size_text.get_rect()
         size_text_rec.topleft = (10, y_loc)
         surface.blit(size_text, size_text_rec)
         y_loc += size_text_rec.height
 
-        display_text = self.get_display_text()
+        display_text = self.font.render('Refreshes %d' % stats['display_iterations'], True, InfoText.green, InfoText.blue)
         display_text_rec = display_text.get_rect()
         display_text_rec.topleft = (10, y_loc)
         surface.blit(display_text, display_text_rec)
@@ -67,42 +74,6 @@ class InfoText():
         return self.rect
     # end def
 
-    def get_cycles_text(self, engine):
-        text = self.font.render('Cycles %d' % engine.cycles, True, InfoText.green, InfoText.blue)
-        return text
-    # end def
-
-    def get_births_stats(self, engine):
-        text = self.font.render('Births: %02d; Deaths: %02d' % (engine.births, engine.deaths), True, InfoText.green, InfoText.blue)
-        return text
-    # end def
-
-    def get_age_stats(self, engine):
-        text = self.font.render('Avg Age: %.1f, Stdv Age: %.1f' % (engine.age_avg, engine.age_stdv), True, InfoText.green, InfoText.blue)
-        return text
-    # end def
-
-    def get_health_stats(self, engine):
-        text = self.font.render('Avg Health: %.1f, Stdv Health: %.1f' % (engine.health_avg, engine.health_stdv), True, InfoText.green, InfoText.blue)
-        return text
-    # end def
-
-    def get_size(self, engine):
-        text = self.font.render('Avg Size: %.1f, Stdv Size: %.1f' % (engine.size_avg, engine.size_stdv), True, InfoText.green, InfoText.blue)
-        return text
-    # end def
-
-    def set_display_count(self, display_count):
-        self.display_count = display_count
-
-    def get_display_text(self):
-        text = self.font.render('Refreshes %d' % self.display_count, True, InfoText.green, InfoText.blue)
-        textRect = text.get_rect()
-        textRect.topleft = (10, 30)
-
-        return text
-    # end def
-
     def set_entity(self, entity, entity_pos):
         self.entity = entity
         self.entity_pos = entity_pos
@@ -113,9 +84,6 @@ class InfoText():
             entity_text = 'Entity: %s %s' % (str(self.entity_pos), str(self.entity))
 
         text = self.font.render(entity_text, True, InfoText.green, InfoText.blue)
-        textRect = text.get_rect()
-        textRect.topleft = (10, 40)
-
         return text
     # end def
 # end def

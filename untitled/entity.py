@@ -38,7 +38,7 @@ class Entity:
             self.phenotype = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         else:
             avg_size = (parents[0].size + parents[1].size) / 2.0
-            self.size = np.random.normal(avg_size, Entity.size_range)
+            self.size = max(0.1, np.random.normal(avg_size, Entity.size_range))
 
             # avg phenotype values
             a = (parents[0].phenotype[0] + parents[1].phenotype[0]) / 2.0
@@ -66,7 +66,6 @@ class Entity:
             self.initial_health_factor = np.random.normal(avg_factor, 0.5)
         # end if
 
-        # end if
         return self.calc_health()
     # end def
 
@@ -105,47 +104,10 @@ class Entity:
         # end if
     # end def
 
-    def procreate(self, neighbors):
-        if self.age >= self.mature_age:
-            for neighbor in neighbors:
-                if neighbor.sex != self.sex and neighbor.age >= neighbor.mature_age:
-                    child = Entity((self, neighbor))
-
-                    # adjust femail parent health
-                    female_parent = self if self.sex == Entity.FEMALE else neighbor
-                    if random.random() < Entity.birthing_death_rate or female_parent.health < Entity.birthing_min_health:
-                        female_parent.health = 0.0
-                    else:
-                        # giving birth increases health; if it doesn't kill the entity
-                        female_parent.health = female_parent.health * (1 + numpy.random.normal(Entity.birthing_health_bonus, Entity.birthing_health_bonus/10))
-                        female_parent.health = max(0, min(100, female_parent.health))
-                    # end if
-
-                    return child
-                #end if
-            # end for
-        # end if
-
-        return None
-    # end def
-
-    def progress(self, neighbors=[]):
+    def progress(self, neighbors):
         self.age += 1
         self.health = self.calc_health(neighbors)
-
-        if self.health > 0:
-            if len(neighbors) > 0:
-                local_size = (sum(neighbor.size for neighbor in neighbors) + self.size) / (len(neighbors) + 1)
-            else:
-                local_size = self.size
-            # end if
-            self.size = max(0.1, np.random.normal(local_size, Entity.size_range))
-
-            if len(neighbors) < 4: # if there is an empty space for a child
-                return self.procreate(neighbors)
-        # end if
-
-        return None
+        self.size = max(0.1, np.random.normal(self.size, self.size/10.0))
     # end def
 
     def __str__(self):
