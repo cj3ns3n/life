@@ -6,7 +6,7 @@ from info_text import InfoText
 from pos import Pos
 
 class LifeDisplay:
-    image_save_frequency = 30 * 1000  # 30 sec
+    image_save_frequency = 10 # 10 cycles
 
     def __init__(self, display_size = (600, 300)):
         pygame.init()
@@ -103,7 +103,6 @@ class LifeDisplay:
 
         self.render_rows((0, self.display_size[0]), (0, self.display_size[1]))
 
-        image_count = 0
         first = True
         while game_running:
             self.infoText.blit(self.surface, self.stats)
@@ -129,11 +128,9 @@ class LifeDisplay:
             #end if
 
             # save periodic image
-            if pygame.time.get_ticks() > LifeDisplay.image_save_frequency * image_count:
-                filename = 'life-%04d.jpg' % image_count
+            if self.stats.cycles % LifeDisplay.image_save_frequency == 0:
+                filename = 'life-%06d.jpg' % self.stats.cycles
                 pygame.image.save(self.surface, filename)
-                #print('saved %s' % filename)
-                image_count += 1
             # end if
 
             self.stats.increment_display_iterations()
