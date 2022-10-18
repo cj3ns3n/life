@@ -9,13 +9,13 @@ class EntityEngine(threading.Thread):
         threading.Thread.__init__(self)
 
         self.entities = entities
-        self.processed_rows = []
+        self.processed_rows = set()
         self.stats = stats_container
     # end def
 
     def get_processed_rows(self):
         rows = self.processed_rows.copy()
-        self.processed_rows = []
+        self.processed_rows = set()
         return rows
     # end def
 
@@ -94,10 +94,13 @@ class EntityEngine(threading.Thread):
                     # end if
 
                     return child
-                else:
+                elif len(neighbors) < 2:
                     # find new pos
                     self.entities[new_pos] = entity
                     self.entities[pos] = None
+
+                    if new_pos.y != pos.y:
+                        self.processed_rows.add(new_pos.y)
                 # end if
             # end if
         # end if
@@ -134,7 +137,7 @@ class EntityEngine(threading.Thread):
                     # end if
                 # end for x
 
-                self.processed_rows.append(y)
+                self.processed_rows.add(y)
             # end for y
 
             self.stats.increment_cycles()
