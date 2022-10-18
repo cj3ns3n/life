@@ -81,7 +81,7 @@ class LifeDisplay:
         # end for
     # end def
 
-    def render_rows(self, x_range, y_range):
+    def render_rows(self, y_range):
         for y in range(y_range[0], y_range[1]):
             self.render_row(y)
     # end def
@@ -101,7 +101,7 @@ class LifeDisplay:
         game_running = True
         last_mouse_pos = Pos(0, 0)
 
-        self.render_rows((0, self.display_size[0]), (0, self.display_size[1]))
+        self.render_rows((0, self.display_size[1]))
 
         first = True
         while game_running:
