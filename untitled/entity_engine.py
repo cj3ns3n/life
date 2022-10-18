@@ -80,6 +80,7 @@ class EntityEngine(threading.Thread):
             new_pos = self.get_vacant_position(pos, entity.preferred_direction)
             if new_pos:
                 best_mate = self.find_mate(entity, neighbors)
+                #print('%s, %s, %d' % (repr(pos), repr(best_mate), len(neighbors)))
 
                 if best_mate:
                     child = Entity((entity, best_mate))
@@ -98,7 +99,7 @@ class EntityEngine(threading.Thread):
                     # end if
 
                     return child
-                elif not self.child_exists(neighbors) and len(neighbors) < 2:
+                elif not self.child_exists(neighbors):
                     # find new pos
                     self.entities[new_pos] = entity
                     self.entities[pos] = None
