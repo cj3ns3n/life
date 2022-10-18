@@ -1,4 +1,5 @@
 import pygame
+from entity import Entity
 from entities import Entities
 from entity_engine import EntityEngine
 from stats_container import StatsContainer
@@ -23,7 +24,6 @@ class LifeDisplay:
         self.engine.start()
 
         self.max_age = 120
-        self.max_size = 2
         self.min_size = 1
         self.max_health = 100
         self.min_health = 75
@@ -31,7 +31,7 @@ class LifeDisplay:
         self.show_phenotype = True
         self.show_age = True
         self.show_health = True
-        self.show_size = True
+        self.show_sex = True
     #end def
 
     def entity_color(self, entity):
@@ -53,12 +53,14 @@ class LifeDisplay:
                         self.min_health = entity.health
                     g = int(255.0 * (entity.health - self.min_health) / (self.max_health - self.min_health))
 
-                if self.show_size:
-                    if entity.size > self.max_size:
-                        self.max_size = entity.size
-                    if entity.size < self.min_size:
-                        self.min_size = entity.size
-                    b = int(255.0 * (entity.size - self.min_size) / (self.max_size - self.min_size))
+                if self.show_sex:
+                    if entity.sex == Entity.MALE:
+                        b = 255
+                    else:
+                        r = 255
+
+                    if entity.age < entity.mature_age:
+                        g = 255
                 # end if
             # end if
 
@@ -91,7 +93,7 @@ class LifeDisplay:
         print('\tESC\t- Close program')
         print('\ta\t- Toggle display of age as a color')
         print('\th\t- Toggle display of health as a color')
-        print('\ts\t- Toggle display of size as a color')
+        print('\ts\t- Toggle display of sex as a color')
         print('\tp\t- Toggle display of phenotype color; overrides other entity colors')
     # end def
 
@@ -150,7 +152,7 @@ class LifeDisplay:
                     elif event.key == pygame.K_p:
                         self.show_phenotype = not self.show_phenotype
                     elif event.key == pygame.K_s:
-                        self.show_size = not self.show_size
+                        self.show_sex = not self.show_sex
                 # end if
             # end for
 
