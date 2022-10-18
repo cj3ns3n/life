@@ -129,7 +129,7 @@ class LifeDisplay:
 
             # save periodic image
             if self.stats.cycles % LifeDisplay.image_save_frequency == 0:
-                filename = 'life-%06d.jpg' % self.stats.cycles
+                filename = 'life-%07d.jpg' % self.stats.cycles
                 pygame.image.save(self.surface, filename)
             # end if
 
