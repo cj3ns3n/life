@@ -21,7 +21,9 @@ class EntityEngine(threading.Thread):
 
     def get_vacant_position(self, pos, preferred_dir):
         vacant_positions = self.entities.get_vacant_neighbor_positions(pos)
-        if len(vacant_positions) > 0:
+        if len(vacant_positions) == 1:
+            return vacant_positions[0]
+        elif len(vacant_positions) > 0:
             if preferred_dir == Entity.NORTH:
                 north_loc = Pos(pos.x, pos.y - 1)
                 if north_loc in vacant_positions:
