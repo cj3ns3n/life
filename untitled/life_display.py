@@ -154,7 +154,7 @@ class LifeDisplay:
                 # end if
             # end for
 
-            mouse_pos = Pos(tuple=pygame.mouse.get_pos())
+            mouse_pos = Pos(tuple_pos=pygame.mouse.get_pos())
             if mouse_pos != last_mouse_pos:
                 last_mouse_pos = mouse_pos
                 #print('mouse position', pos)

@@ -1,8 +1,8 @@
 class Pos:
-    def __init__(self, x=-1, y=-1, pos=None, tuple=None):
-        if tuple is not None:
-            self.x = tuple[0]
-            self.y = tuple[1]
+    def __init__(self, x=-1, y=-1, pos=None, tuple_pos=None):
+        if tuple_pos is not None:
+            self.x = tuple_pos[0]
+            self.y = tuple_pos[1]
         elif pos is not None:
             self.x = pos.x
             self.y = pos.y
@@ -11,15 +11,15 @@ class Pos:
             self.y = y
     # end def
 
-    def __eq__(self, otherObj):
-        if isinstance(otherObj, Pos):
-            return self.x == otherObj.x and self.y == otherObj.y
+    def __eq__(self, other_obj):
+        if isinstance(other_obj, Pos):
+            return self.x == other_obj.x and self.y == other_obj.y
         else:
             raise ValueError
     # end def
 
-    def __ne__(self, otherObj):
-        return not self == otherObj
+    def __ne__(self, other_obj):
+        return not self == other_obj
     # end def
 
     def __repr__(self):
@@ -32,7 +32,7 @@ class Pos:
 if __name__ == '__main__':
     p0 = Pos(0, 0)
     p00 = Pos(pos=p0)
-    p1 = Pos(tuple=(1, 1))
+    p1 = Pos(tuple_pos=(1, 1))
 
     print(p0 == p0)  # true
     print(p0 == p00) # true
