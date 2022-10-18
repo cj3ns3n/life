@@ -38,10 +38,12 @@ class EntityEngine(threading.Thread):
                 east_loc = Pos(pos.x + 1, pos.y)
                 if east_loc in vacant_positions:
                     return east_loc
-            else:
-                return random.choice(vacant_positions)
-        else:
-            return None
+            # end if
+
+            return random.choice(vacant_positions)
+        # end if
+
+        return None
     # end def
 
     def entity_dist(self, entity1, entity2):
