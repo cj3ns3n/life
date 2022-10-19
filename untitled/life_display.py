@@ -73,19 +73,41 @@ class LifeDisplay:
 
     def render_row(self, row_idx):
         for x in range(0, self.display_size[0]):
-            entity = self.entities[Pos(x, row_idx)]
+            pos = Pos(x, row_idx)
+            entity = self.entities[pos]
             entity_rect = pygame.Rect(x, row_idx, 1, 1)
             try:
                 pygame.draw.rect(self.surface, self.entity_color(entity), entity_rect)
             except ValueError:
                 print(repr(entity))
                 raise
+            # end try
+
+            if entity and entity.age == 0:
+                # show burst for new borns
+                self.render_burst(pos)
         # end for
     # end def
 
     def render_rows(self, y_range):
         for y in range(y_range[0], y_range[1]):
             self.render_row(y)
+    # end def
+
+    def render_burst(self, pos):
+        leftx = max(0, pos.x - 3)
+        lefty = max(0, pos.y - 3)
+        centerx = max(0, pos.x - 1)
+        centery = max(0, pos.y - 1)
+
+        burst_rect = pygame.Rect(leftx, pos.y, 7, 1)
+        pygame.draw.rect(self.surface, (255, 255, 255, 250), burst_rect)
+        burst_rect = pygame.Rect(pos.x, lefty, 1, 7)
+        pygame.draw.rect(self.surface, (255, 255, 255, 250), burst_rect)
+        burst_rect = pygame.Rect(centerx, centery, 3, 3)
+        pygame.draw.rect(self.surface, (255, 255, 255, 250), burst_rect)
+
+        return pygame.Rect(leftx, lefty, 7, 7)
     # end def
 
     def print_keys(self):
@@ -124,15 +146,15 @@ class LifeDisplay:
                     #print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
                     #print(update_rect)
                     pygame.display.update(update_rect)
-                #end if
+                # end if
 
                 pygame.display.update(self.infoText.get_rect())
-            #end if
+            # end if
 
             # save periodic image
             if self.stats.cycles % LifeDisplay.image_save_frequency == 0:
                 filename = 'life-%07d.jpg' % self.stats.cycles
-                pygame.image.save(self.surface, filename)
+                #pygame.image.save(self.surface, filename)
             # end if
 
             self.stats.increment_display_iterations()
