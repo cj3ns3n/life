@@ -40,9 +40,10 @@ class TerminalDisplay:
         self.scr.addstr(10, 0, 'Key Commands:')
         self.scr.addstr(11, 0, '\tESC\t- Close program')
         self.scr.addstr(12, 0, '\ta\t- Toggle display of age as a color')
-        self.scr.addstr(13, 0, '\th\t- Toggle display of health as a color')
-        self.scr.addstr(14, 0, '\ts\t- Toggle display of sex as a color')
-        self.scr.addstr(15, 0, '\tp\t- Toggle display of phenotype color; overrides other entity colors')
+        self.scr.addstr(13, 0, '\tb\t- Toggle display of birth sparkle')
+        self.scr.addstr(14, 0, '\th\t- Toggle display of health as a color')
+        self.scr.addstr(15, 0, '\ts\t- Toggle display of sex as a color')
+        self.scr.addstr(16, 0, '\tp\t- Toggle display of phenotype color; overrides other entity colors')
 
         self.scr.refresh()
     # end def

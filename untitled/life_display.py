@@ -32,6 +32,7 @@ class LifeDisplay:
 
         self.show_phenotype = True
         self.show_age = True
+        self.show_sparkles = True
         self.show_health = True
         self.show_sex = True
     # end def
@@ -85,7 +86,7 @@ class LifeDisplay:
                 raise
             # end try
 
-            if entity and entity.age == 0:
+            if self.show_sparkles and entity and entity.age == 0:
                 # show burst for new borns
                 self.render_burst(pos)
         # end for
@@ -112,17 +113,7 @@ class LifeDisplay:
         return pygame.Rect(leftx, lefty, 7, 7)
     # end def
 
-    def print_keys(self):
-        print('Key Commands:')
-        print('\tESC\t- Close program')
-        print('\ta\t- Toggle display of age as a color')
-        print('\th\t- Toggle display of health as a color')
-        print('\ts\t- Toggle display of sex as a color')
-        print('\tp\t- Toggle display of phenotype color; overrides other entity colors')
-    # end def
-
     def display(self):
-        #self.print_keys()
         self.terminal.run()
 
         game_running = True
@@ -174,6 +165,8 @@ class LifeDisplay:
                         break
                     elif event.key == pygame.K_a:
                         self.show_age = not self.show_age
+                    elif event.key == pygame.K_b:
+                        self.show_sparkles = not self.show_sparkles
                     elif event.key == pygame.K_h:
                         self.show_health = not self.show_health
                     elif event.key == pygame.K_p:
