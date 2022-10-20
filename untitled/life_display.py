@@ -69,7 +69,7 @@ class LifeDisplay:
             # end if
 
             if r < 0 or r > 255 or g < 0 or g > 255 or b < 0 or b > 255:
-                print('%s: %s' % (str((r, g, b)), str(entity)))
+                self.terminal.add_message('bad color: %s: %s' % (str((r, g, b)), str(entity)))
         # end if
 
         return (r, g, b)
@@ -136,8 +136,6 @@ class LifeDisplay:
                     width = self.display_size[0]
                     height = 1
                     update_rect = pygame.Rect(0, updated_row, width, height)
-                    #print('update: %d, (%03d, %03d)' % (len(updated_rows), min_row, max_row))
-                    #print(update_rect)
                     pygame.display.update(update_rect)
                 # end if
 
@@ -182,7 +180,7 @@ class LifeDisplay:
             mouse_pos = Pos(tuple_pos=pygame.mouse.get_pos())
             if mouse_pos != last_mouse_pos:
                 last_mouse_pos = mouse_pos
-                #print('mouse position', pos)
+                self.terminal.add_message('mouse position %s' % repr(mouse_pos))
                 self.infoText.set_entity(self.entities[mouse_pos], mouse_pos)
         # end while
 
