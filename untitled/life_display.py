@@ -35,6 +35,7 @@ class LifeDisplay:
         self.show_sparkles = True
         self.show_health = True
         self.show_sex = True
+        self.show_stats_overlay = True
     # end def
 
     def entity_color(self, entity):
@@ -123,8 +124,6 @@ class LifeDisplay:
 
         first = True
         while game_running:
-            self.infoText.blit(self.surface, self.stats)
-
             if first:
                 pygame.display.flip()
                 first = False
@@ -142,7 +141,9 @@ class LifeDisplay:
                     pygame.display.update(update_rect)
                 # end if
 
-                pygame.display.update(self.infoText.get_rect())
+                if self.show_stats_overlay:
+                    self.infoText.blit(self.surface, self.stats)
+                    pygame.display.update(self.infoText.get_rect())
             # end if
 
             self.terminal.run()
@@ -169,6 +170,8 @@ class LifeDisplay:
                         self.show_sparkles = not self.show_sparkles
                     elif event.key == pygame.K_h:
                         self.show_health = not self.show_health
+                    elif event.key == pygame.K_o:
+                        self.show_stats_overlay = not self.show_stats_overlay
                     elif event.key == pygame.K_p:
                         self.show_phenotype = not self.show_phenotype
                     elif event.key == pygame.K_s:
