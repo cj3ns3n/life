@@ -33,10 +33,16 @@ class Entity:
         self.health = self.get_initial_health(parents)
 
         if parents is None:
+            self.parents = ()
+            self.grandparents = ()
+
             self.size = max(0.1, np.random.normal(1, Entity.size_range))
             self.mature_age = np.random.normal(Entity.mature_age, Entity.mature_age_range)
             self.phenotype = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         else:
+            self.parents = parents
+            self.grandparents = parents[0].parents + parents[1].parents
+
             avg_size = (parents[0].size + parents[1].size) / 2.0
             self.size = max(0.1, np.random.normal(avg_size, Entity.size_range))
 

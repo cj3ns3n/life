@@ -57,6 +57,18 @@ class EntityEngine(threading.Thread):
         return square_sums**0.5
     # end def
 
+    def incest_check(self, entity1, entity2):
+        ancestry = entity1.parents + entity1.grandparents + entity2.parents + entity2.grandparents
+        if entity1 in ancestry or entity2 in ancestry:
+            # shared parents or grandparents
+            return False
+        if any(x in entity1.parents + entity1.grandparents for x in entity2.parents + entity2.grandparents):
+            # siblings or aunt/uncle
+            return False
+
+        return True
+    # end def
+
     def find_mate(self, entity, neighbors):
         best_mate = None
 
@@ -64,10 +76,12 @@ class EntityEngine(threading.Thread):
             best_dist = 10000
             for neighbor in neighbors:
                 if neighbor.sex != entity.sex and neighbor.age >= neighbor.mature_age:
-                    dist = self.entity_dist(entity, neighbor)
-                    if dist < best_dist:
-                        best_dist = dist
-                        best_mate = neighbor
+                    if self.incest_check(entity, neighbor):
+                        dist = self.entity_dist(entity, neighbor)
+                        if dist < best_dist:
+                            best_dist = dist
+                            best_mate = neighbor
+                    # end if
                 # end if
             # end for
         # end if

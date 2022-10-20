@@ -15,10 +15,24 @@ class Entities:
         for y in range(size[1]):
             row = []
             for x in range(size[0]):
+                if x == 200 and y == 150:
+                    adam = Entity()
+                    adam.sex = 'm'
+                    adam.mature_age = 4
+                    row.append(adam)
+                elif x == 201 and y == 150:
+                    eve = Entity()
+                    eve.sex = 'f'
+                    eve.mature_age = 4
+                    row.append(eve)
+                else:
+                    row.append(None)
+                """
                 if random.random() < life_likelyhood:
                     row.append(Entity())
                 else:
                     row.append(None)
+                """
             entities.append(row)
         # end for
 
