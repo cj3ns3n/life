@@ -1,10 +1,11 @@
 import pygame
+from pos import Pos
 from entity import Entity
 from entities import Entities
 from entity_engine import EntityEngine
 from stats_container import StatsContainer
 from info_text import InfoText
-from pos import Pos
+from terminal_display import TerminalDisplay
 
 class LifeDisplay:
     image_save_frequency = 10 # 10 cycles
@@ -18,6 +19,7 @@ class LifeDisplay:
 
         self.stats = StatsContainer()
         self.infoText = InfoText()
+        self.terminal = TerminalDisplay(self.stats)
 
         self.engine = EntityEngine(self.entities, self.stats)
         self.engine.daemon = True
@@ -120,8 +122,9 @@ class LifeDisplay:
     # end def
 
     def display(self):
-        self.print_keys()
-        
+        #self.print_keys()
+        self.terminal.run()
+
         game_running = True
         last_mouse_pos = Pos(0, 0)
 
@@ -150,6 +153,8 @@ class LifeDisplay:
 
                 pygame.display.update(self.infoText.get_rect())
             # end if
+
+            self.terminal.run()
 
             # save periodic image
             if self.stats.cycles % LifeDisplay.image_save_frequency == 0:
@@ -185,6 +190,7 @@ class LifeDisplay:
                 self.infoText.set_entity(self.entities[mouse_pos], mouse_pos)
         # end while
 
+        self.terminal.shutdown()
         pygame.quit()
         exit()
     #end def
