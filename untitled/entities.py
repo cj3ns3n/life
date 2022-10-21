@@ -3,10 +3,11 @@ from entity import Entity
 import random
 
 class Entities:
-    def __init__(self, size, life_likelyhood=0.05):
+    def __init__(self, size, terminal, life_likelyhood=0.1):
         self.size = size
         self.width = size[0]
         self.height = size[1]
+        self.terminal = terminal
         self.entities = self.birth_entities(size, life_likelyhood)
     # end def
 
@@ -15,15 +16,18 @@ class Entities:
         for y in range(size[1]):
             row = []
             for x in range(size[0]):
+                """
                 if x == 200 and y == 150:
                     adam = Entity()
                     adam.sex = 'm'
-                    adam.mature_age = 4
+                    adam.mature_age = 3
+                    adam.preferred_direction = 'e'
                     row.append(adam)
                 elif x == 201 and y == 150:
                     eve = Entity()
                     eve.sex = 'f'
-                    eve.mature_age = 4
+                    eve.mature_age = 3
+                    eve.preferred_direction = 'e'
                     row.append(eve)
                 else:
                     row.append(None)
@@ -32,7 +36,6 @@ class Entities:
                     row.append(Entity())
                 else:
                     row.append(None)
-                """
             entities.append(row)
         # end for
 
@@ -61,6 +64,8 @@ class Entities:
         if pos.y < self.height - 1:  # bottom neighbor
             neighbors.append(self[Pos(pos.x, pos.y+1)])
 
+        if len(neighbors) > 4:
+            self.terminal.add_message('lots o neighbors: %d', len(neighbors))
         return list(filter(lambda n: n is not None and n.health > 0.0, neighbors))
     # end def
 

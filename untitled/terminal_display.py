@@ -5,6 +5,7 @@ class TerminalDisplay:
     def __init__(self, stats_container):
         self.stats_container = stats_container
         self.scr = curses.initscr()
+        self.size = self.scr.getmaxyx()
         curses.noecho()
         curses.cbreak()
         curses.curs_set(False)
@@ -15,6 +16,9 @@ class TerminalDisplay:
     # end def
 
     def add_message(self, message):
+        if len(message) < self.size[0]:
+            message = message + ' ' * (self.size[0] - len(message))
+
         self.messages.append(message)
         if len(self.messages) > 5:
             self.messages = self.messages[-5:]

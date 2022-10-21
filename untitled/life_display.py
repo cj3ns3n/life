@@ -12,16 +12,17 @@ class LifeDisplay:
 
     def __init__(self, display_size = (600, 300)):
         pygame.init()
-        self.display_size = display_size
-        self.surface = pygame.display.set_mode(display_size)
-
-        self.entities = Entities(display_size)
 
         self.stats = StatsContainer()
         self.infoText = InfoText()
         self.terminal = TerminalDisplay(self.stats)
 
-        self.engine = EntityEngine(self.entities, self.stats)
+        self.display_size = display_size
+        self.surface = pygame.display.set_mode(display_size)
+
+        self.entities = Entities(display_size, self.terminal)
+
+        self.engine = EntityEngine(self.entities, self.stats, self.terminal)
         self.engine.daemon = True
         self.engine.start()
 
@@ -180,7 +181,7 @@ class LifeDisplay:
             mouse_pos = Pos(tuple_pos=pygame.mouse.get_pos())
             if mouse_pos != last_mouse_pos:
                 last_mouse_pos = mouse_pos
-                self.terminal.add_message('mouse position %s' % repr(mouse_pos))
+                #self.terminal.add_message('mouse position %s' % repr(mouse_pos))
                 self.infoText.set_entity(self.entities[mouse_pos], mouse_pos)
         # end while
 

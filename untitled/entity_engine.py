@@ -5,12 +5,13 @@ from pos import Pos
 from entity import Entity
 
 class EntityEngine(threading.Thread):
-    def __init__(self, entities, stats_container):
+    def __init__(self, entities, stats_container, terminal):
         threading.Thread.__init__(self)
 
         self.entities = entities
         self.processed_rows = set()
         self.stats = stats_container
+        self.terminal = terminal
     # end def
 
     def get_processed_rows(self):
@@ -98,7 +99,8 @@ class EntityEngine(threading.Thread):
             new_pos = self.get_vacant_position(pos, entity.preferred_direction)
             if new_pos:
                 best_mate = self.find_mate(entity, neighbors)
-                #print('%s, %s, %d' % (repr(pos), repr(best_mate), len(neighbors)))
+                if len(neighbors) > 4:
+                    self.terminal.add_message('pos: %s, entity: %s, mate: %s, %d' % (repr(pos), repr(entity), repr(best_mate), len(neighbors)))
 
                 if best_mate:
                     child = Entity((entity, best_mate))
