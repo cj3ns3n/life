@@ -16,7 +16,7 @@ class Entities:
             row = []
             for x in range(size[0]):
                 if random.random() < life_likelyhood:
-                    row.append(Entity())
+                    row.append(Entity(0))
                 else:
                     row.append(None)
             entities.append(row)

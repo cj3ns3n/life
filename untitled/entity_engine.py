@@ -87,7 +87,7 @@ class EntityEngine(threading.Thread):
                 #print('%s, %s, %d' % (repr(pos), repr(best_mate), len(neighbors)))
 
                 if best_mate:
-                    child = Entity((entity, best_mate))
+                    child = Entity(self.stats.cycles, (entity, best_mate))
                     self.entities[new_pos] = child
                     self.stats.increment_births(child)
 
@@ -127,21 +127,23 @@ class EntityEngine(threading.Thread):
                 random.shuffle(x_positions)
                 for x in x_positions:
                     pos = Pos(x, y)
-                    neighbors = self.entities.get_neighbors(pos)
-                    random.shuffle(neighbors)
                     entity = self.entities[pos]
                     if entity is not None and entity.health > 0:
-                        if self.stats.cycles == 0:
-                            # add initial entities to births
-                            self.stats.increment_births(entity)
-                        # end if
+                        if entity.cycle < self.stats.cycles:
+                            neighbors = self.entities.get_neighbors(pos)
+                            random.shuffle(neighbors)
+                            if self.stats.cycles == 0:
+                                # add initial entities to births
+                                self.stats.increment_births(entity)
+                            # end if
 
-                        entity.progress(neighbors)
-                        if entity.health > 0.0:
-                            self.stats.add_entity_stats(entity)
-                            self.post_entity_progress(pos, entity, neighbors)
-                        else:
-                            self.stats.increment_natural_deaths(entity)
+                            entity.progress(neighbors, self.stats.cycles)
+                            if entity.health > 0.0:
+                                self.stats.add_entity_stats(entity)
+                                self.post_entity_progress(pos, entity, neighbors)
+                            else:
+                                self.stats.increment_natural_deaths(entity)
+                            # end if
                         # end if
                     # end if
                 # end for x

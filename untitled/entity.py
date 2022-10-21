@@ -4,7 +4,6 @@ import math
 
 import numpy.random
 
-
 class Entity:
     FEMALE = 'f'
     MALE   = 'm'
@@ -25,8 +24,9 @@ class Entity:
     birthing_min_health = 20
     birthing_health_bonus = 0.1
 
-    def __init__(self, parents=None):
+    def __init__(self, cycle, parents=None):
         self.age = 0
+        self.cycle = cycle
         self.sex = random.choice([Entity.MALE, Entity.FEMALE])
         self.preferred_direction = random.choice([Entity.NORTH, Entity.SOUTH, Entity.EAST, Entity.WEST])
 
@@ -104,7 +104,8 @@ class Entity:
         # end if
     # end def
 
-    def progress(self, neighbors):
+    def progress(self, neighbors, cycle):
+        self.cycle = cycle
         self.age += 1
         self.health = self.calc_health(neighbors)
         self.size = max(0.1, np.random.normal(self.size, self.size/10.0))
