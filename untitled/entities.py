@@ -8,7 +8,36 @@ class Entities:
         self.width = size[0]
         self.height = size[1]
         self.terminal = terminal
-        self.entities = self.birth_entities(size, life_likelyhood)
+        self.entities = self.adam_eve(size, Pos(200, 150))
+#        self.entities = self.birth_entities(size, life_likelyhood)
+    # end def
+
+    def adam_eve(self, size, genesis_pos):
+        entities = []
+        for y in range(size[1]):
+            row = []
+            for x in range(size[0]):
+                if x == genesis_pos.x and y == genesis_pos.y:
+                    adam = Entity(-1)
+                    adam.sex = 'm'
+                    adam.mature_age = 10
+                    adam.preferred_direction = 'e'
+                    row.append(adam)
+                elif x == genesis_pos.x + 1 and y == genesis_pos.y:
+                    eve = Entity(-1)
+                    eve.sex = 'f'
+                    eve.mature_age = 9
+                    eve.preferred_direction = 'e'
+                    row.append(eve)
+                else:
+                    row.append(None)
+                # end if
+            # end for
+
+            entities.append(row)
+        # end for
+
+        return entities
     # end def
 
     def birth_entities(self, size, life_likelyhood):
@@ -16,26 +45,11 @@ class Entities:
         for y in range(size[1]):
             row = []
             for x in range(size[0]):
-                """
-                if x == 200 and y == 150:
-                    adam = Entity()
-                    adam.sex = 'm'
-                    adam.mature_age = 3
-                    adam.preferred_direction = 'e'
-                    row.append(adam)
-                elif x == 201 and y == 150:
-                    eve = Entity()
-                    eve.sex = 'f'
-                    eve.mature_age = 3
-                    eve.preferred_direction = 'e'
-                    row.append(eve)
-                else:
-                    row.append(None)
-                """
                 if random.random() < life_likelyhood:
-                    row.append(Entity(0))
+                    row.append(Entity(-1))
                 else:
                     row.append(None)
+            # end for
             entities.append(row)
         # end for
 

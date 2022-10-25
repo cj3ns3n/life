@@ -59,7 +59,7 @@ class TerminalDisplay:
         self.scr.addstr(15, 0, '\ts\t- Toggle display of sex as a color')
 
         for i in range(len(self.messages)):
-            self.scr.addstr(21-i, 0, self.messages[i])
+            self.scr.addstr(17+i, 0, self.messages[i])
 
         self.scr.refresh()
     # end def

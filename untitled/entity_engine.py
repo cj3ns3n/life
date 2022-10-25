@@ -91,7 +91,7 @@ class EntityEngine(threading.Thread):
     # end def
 
     def child_exists(self, neighbors):
-        return len(list(filter(lambda entity: entity.age >= entity.mature_age, neighbors))) > 0
+        return len(list(filter(lambda entity: entity.age < entity.mature_age, neighbors))) > 0
     # end def
 
     def post_entity_progress(self, pos, entity, neighbors):
@@ -106,10 +106,12 @@ class EntityEngine(threading.Thread):
                     child = Entity(self.stats.cycles, (entity, best_mate))
                     self.entities[new_pos] = child
                     self.stats.increment_births(child)
+                    self.terminal.add_message('birth %s; %d; %d' % (repr(pos), child.mature_age, self.stats.births_count))
 
                     # adjust female parent health
                     female_parent = entity if entity.sex == Entity.FEMALE else best_mate
-                    if random.random() < Entity.birthing_death_rate or female_parent.health < Entity.birthing_min_health:
+                    #if random.random() < Entity.birthing_death_rate or female_parent.health < Entity.birthing_min_health:
+                    if female_parent.health < Entity.birthing_min_health:
                         self.stats.increment_maternal_deaths()
                         female_parent.health = 0.0
                     else:
@@ -126,6 +128,8 @@ class EntityEngine(threading.Thread):
 
                     if new_pos.y != pos.y:
                         self.processed_rows.add(new_pos.y)
+                else:
+                    self.terminal.add_message('child neighbor: %s' % repr(pos))
                 # end if
             # end if
         # end if
@@ -151,6 +155,7 @@ class EntityEngine(threading.Thread):
                             if self.stats.cycles == 0:
                                 # add initial entities to births
                                 self.stats.increment_births(entity)
+                                self.terminal.add_message('birth: %s; %d' % (repr(pos), self.stats.births_count))
                             # end if
 
                             entity.progress(neighbors, self.stats.cycles)
@@ -159,6 +164,7 @@ class EntityEngine(threading.Thread):
                                 self.post_entity_progress(pos, entity, neighbors)
                             else:
                                 self.stats.increment_natural_deaths(entity)
+                                self.terminal.add_message('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))
                             # end if
                         # end if
                     # end if
