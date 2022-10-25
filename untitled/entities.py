@@ -8,8 +8,8 @@ class Entities:
         self.width = size[0]
         self.height = size[1]
         self.terminal = terminal
-        self.entities = self.adam_eve(size, Pos(200, 150))
-#        self.entities = self.birth_entities(size, life_likelyhood)
+        #self.entities = self.adam_eve(size, Pos(200, 150))
+        self.entities = self.birth_entities(size, life_likelyhood)
     # end def
 
     def adam_eve(self, size, genesis_pos):
