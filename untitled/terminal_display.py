@@ -1,5 +1,5 @@
 import curses
-import sys
+from threading import Lock
 
 class TerminalDisplay:
     def __init__(self, stats_container):
@@ -12,16 +12,22 @@ class TerminalDisplay:
         if curses.has_colors():
             curses.start_color()
 
+        self.terminal_lock = Lock()
         self.messages = []
     # end def
 
     def add_message(self, message):
-        if len(message) < self.size[0]:
-            message = message + ' ' * (self.size[0] - len(message))
+        self.terminal_lock.acquire()
+        try:
+            if len(message) < self.size[0]:
+                message = message + ' ' * (self.size[0] - len(message))
 
-        self.messages.append(message)
-        if len(self.messages) > 5:
-            self.messages = self.messages[-5:]
+            self.messages.append(message)
+            if len(self.messages) > 5:
+                self.messages = self.messages[-5:]
+        finally:
+            self.terminal_lock.release()
+
     # end def
 
     def run(self):
@@ -58,8 +64,12 @@ class TerminalDisplay:
         self.scr.addstr(14, 0, '\tp\t- Toggle display of phenotype color; overrides other entity colors')
         self.scr.addstr(15, 0, '\ts\t- Toggle display of sex as a color')
 
-        for i in range(len(self.messages)):
-            self.scr.addstr(17+i, 0, self.messages[i])
+        self.terminal_lock.acquire()
+        try:
+            for i in range(len(self.messages)):
+                self.scr.addstr(17+i, 0, self.messages[i])
+        finally:
+            self.terminal_lock.release()
 
         self.scr.refresh()
     # end def
