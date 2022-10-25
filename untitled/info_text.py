@@ -34,8 +34,7 @@ class InfoText():
         m_deaths = stats['maternal_deaths']
         n_deaths = stats['natural_deaths']
         m_deathrate = 100.0 * float(m_deaths) / float(births) if births > 0 else 0.0
-        n_deathrate = 100.0 * float(n_deaths) / float(births) if births > 0 else 0.0  # skewed because initial spawned entities are not in the birth count
-        births_text_str = 'Births: %02d; Maternal Deaths: %02d (rate: %0.1f%%); Natural Deaths: %02d (rate: %0.1f%%)' % (births, m_deaths, m_deathrate, n_deaths, n_deathrate)
+        births_text_str = 'Births: %02d; (birth rate: %0.1f) Maternal Deaths: %02d (rate: %0.1f%%); Natural Deaths: %02d (death rate: %0.1f%%)' % (births, stats['birth_rate']*100, m_deaths, m_deathrate, n_deaths, stats['death_rate']*100)
         births_text = self.font.render(births_text_str, True, InfoText.green, InfoText.blue)
         births_text_rec = births_text.get_rect()
         births_text_rec.topleft = (10, y_loc)

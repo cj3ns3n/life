@@ -23,6 +23,11 @@ class StatsContainer:
         self.natural_deaths = 0
         self.maternal_deaths = 0
         self.display_iterations = 0
+
+        self.cycle_births = 0
+        self.birth_rate = 0.0
+        self.cycle_deaths = 0
+        self.death_rate = 0.0
     # end init
 
     def get_stats(self):
@@ -41,6 +46,8 @@ class StatsContainer:
         stats['females'] = self.female_count
         stats['cycles'] = self.cycles
         stats['display_iterations'] = self.display_iterations
+        stats['death_rate'] = self.death_rate
+        stats['birth_rate'] = self.birth_rate
 
         return stats
     # end def
@@ -71,25 +78,40 @@ class StatsContainer:
 
     def increment_display_iterations(self):
         self.display_iterations += 1
+    # end def
 
     def increment_cycles(self):
         self.cycles += 1
 
+        population = self.births_count - self.maternal_deaths - self.natural_deaths
+        self.birth_rate = float(self.cycle_births) / float(population)
+        self.cycle_births = 0
+
+        self.death_rate = float(self.cycle_deaths) / float(population)
+        self.cycle_deaths = 0
+    # end def
+
     def increment_births(self, baby):
         self.births_count += 1
+        self.cycle_births += 1
         if baby.sex == Entity.MALE:
             self.males_count += 1
         else:
             self.female_count += 1
+    # end def
 
     def increment_natural_deaths(self, entity):
         self.natural_deaths += 1
+        self.cycle_deaths == 1
         if entity.sex == Entity.MALE:
             self.males_count -= 1
         else:
             self.female_count -= 1
+    # end def
 
     def increment_maternal_deaths(self):
         self.maternal_deaths += 1
         self.female_count -= 1
+        self.cycle_deaths += 1
+    # end def
 # end class
