@@ -3,4 +3,10 @@ class Food:
         self.nutrient_level = init_nutrients
         self.replenish_rate = replenish_rate
     # end def
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return '(level: %d, rate: %.1f)' % (self.nutrient_level, self.replenish_rate)
 # end class

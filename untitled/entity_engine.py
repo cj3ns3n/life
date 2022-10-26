@@ -3,12 +3,14 @@ import random
 import numpy
 from pos import Pos
 from entity import Entity
+from food import Food
 
 class EntityEngine(threading.Thread):
-    def __init__(self, entities, stats_container, terminal):
+    def __init__(self, entities, land, stats_container, terminal):
         threading.Thread.__init__(self)
 
         self.entities = entities
+        self.land = land
         self.processed_rows = set()
         self.stats = stats_container
         self.terminal = terminal
@@ -22,6 +24,7 @@ class EntityEngine(threading.Thread):
 
     def get_vacant_position(self, pos, preferred_dir):
         vacant_positions = self.entities.get_vacant_neighbor_positions(pos)
+
         if len(vacant_positions) == 1:
             return vacant_positions[0]
         elif len(vacant_positions) > 0:
@@ -94,7 +97,25 @@ class EntityEngine(threading.Thread):
         return len(list(filter(lambda entity: entity.age < entity.mature_age, neighbors))) > 0
     # end def
 
-    def post_entity_progress(self, pos, entity, neighbors):
+    def post_entity_progress(self, pos, entity, nutrients, neighbors):
+        needed_nutrients = 0
+        if entity.health < 100:
+            needed_nutrients = min(entity.size, entity.size - (100 - entity.health))
+
+        if needed_nutrients > entity.size:
+            self.terminal.add_message('over eating: %s, %s, %s' % (pos, entity, nutrients))
+
+        if nutrients:
+            new_level = nutrients.nutrient_level - needed_nutrients
+            nutrients.nutrient_level = max(0, new_level)
+        else:
+            new_level = -needed_nutrients
+        # end if
+
+        if new_level < 0:
+            # not enough nutrients
+            entity.health = max(0, min(100, entity.health + new_level))
+
         if len(neighbors) < 4 and entity.age >= entity.mature_age:
             new_pos = self.get_vacant_position(pos, entity.preferred_direction)
             if new_pos:
@@ -132,6 +153,34 @@ class EntityEngine(threading.Thread):
         # end if
     # end def
 
+    def get_random_neighbor(self, pos):
+        x = max(0, min(self.land.width-1, pos.x + random.randint(0, 1)))
+        y = max(0, min(self.land.height-1, pos.y + random.randint(-1, 1)))
+
+        return Pos(x, y)
+    # end def
+
+    def spread_nutrients(self, amount, pos):
+        try:
+            next_pos = self.get_random_neighbor(pos)
+            nutrients = self.land[next_pos]
+            if nutrients:
+                nutrients.nutrient_level = min(100, nutrients.nutrient_level + amount)
+            else:
+                self.land[next_pos] = Food(init_nutrients = amount)
+        except IndexError:
+            self.terminal.add_message('bad food index %s - %s' % (repr(pos), repr(next_pos)))
+
+    # end def
+
+    def post_nutrient_progress(self, nutrients, pos):
+        nutrients.nutrient_level += nutrients.replenish_rate
+        if nutrients.nutrient_level > 100:
+            extra_nutrients = nutrients.nutrient_level - 100
+            nutrients.nutrient_level = 100
+            self.spread_nutrients(extra_nutrients, pos)
+    # end def
+
     def run(self):
         while True:
             stats_thread = None
@@ -145,6 +194,8 @@ class EntityEngine(threading.Thread):
                 for x in x_positions:
                     pos = Pos(x, y)
                     entity = self.entities[pos]
+                    nutrients = self.land[pos]
+
                     if entity is not None and entity.health > 0:
                         if entity.cycle < self.stats.cycles:
                             neighbors = self.entities.get_neighbors(pos)
@@ -158,13 +209,16 @@ class EntityEngine(threading.Thread):
                             entity.progress(neighbors, self.stats.cycles)
                             if entity.health > 0.0:
                                 self.stats.add_entity_stats(entity)
-                                self.post_entity_progress(pos, entity, neighbors)
+                                self.post_entity_progress(pos, entity, nutrients, neighbors)
                             else:
                                 self.stats.increment_natural_deaths(entity)
                                 #self.terminal.add_message('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))
                             # end if
                         # end if
                     # end if
+
+                    if nutrients:
+                        self.post_nutrient_progress(nutrients, pos)
                 # end for x
 
                 self.processed_rows.add(y)

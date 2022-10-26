@@ -69,9 +69,10 @@ class TerminalDisplay:
         self.scr.addstr(commands_line + 2, 0, '\ta\t- Toggle display of age as a color')
         self.scr.addstr(commands_line + 3, 0, '\tb\t- Toggle display of birth sparkle')
         self.scr.addstr(commands_line + 4, 0, '\th\t- Toggle display of health as a color')
-        self.scr.addstr(commands_line + 5, 0, '\to\t- Toggle display of stats overlay')
-        self.scr.addstr(commands_line + 6, 0, '\tp\t- Toggle display of phenotype color; overrides other entity colors')
-        self.scr.addstr(commands_line + 7, 0, '\ts\t- Toggle display of sex as a color')
+        self.scr.addstr(commands_line + 5, 0, '\tl\t- Toggle display of land nutrients')
+        self.scr.addstr(commands_line + 6, 0, '\to\t- Toggle display of stats overlay')
+        self.scr.addstr(commands_line + 7, 0, '\tp\t- Toggle display of phenotype color; overrides other entity colors')
+        self.scr.addstr(commands_line + 8, 0, '\ts\t- Toggle display of sex as a color')
 
         self.scr.refresh()
     # end def

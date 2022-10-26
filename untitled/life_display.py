@@ -24,7 +24,7 @@ class LifeDisplay:
         self.entities = Entities(display_size, self.terminal)
         self.land = Land(display_size, self.terminal)
 
-        self.engine = EntityEngine(self.entities, self.stats, self.terminal)
+        self.engine = EntityEngine(self.entities, self.land, self.stats, self.terminal)
         self.engine.daemon = True
         self.engine.start()
 
@@ -190,6 +190,8 @@ class LifeDisplay:
                         self.show_sparkles = not self.show_sparkles
                     elif event.key == pygame.K_h:
                         self.show_health = not self.show_health
+                    elif event.key == pygame.K_l:
+                        self.show_land = not self.show_land
                     elif event.key == pygame.K_o:
                         self.show_stats_overlay = not self.show_stats_overlay
                     elif event.key == pygame.K_p:

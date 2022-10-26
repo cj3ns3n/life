@@ -114,7 +114,15 @@ class Entity:
         self.cycle = cycle
         self.age += 1
         self.health = self.calc_health(neighbors)
-        self.size = max(0.1, np.random.normal(self.size, self.size/10.0))
+        if self.health > 50:
+            # randomly grow or shrink
+            self.size = max(0.1, np.random.normal(self.size, self.size/10.0))
+        else:
+            # shrink for ill health
+            self.size = min(self.size, np.random.normal(self.size * 0.1, self.size/10.0))
+
+        if self.size <= 0:
+            self.health = 0
     # end def
 
     def __str__(self):
