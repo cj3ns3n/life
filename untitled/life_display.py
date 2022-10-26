@@ -6,6 +6,7 @@ from entity_engine import EntityEngine
 from stats_container import StatsContainer
 from info_text import InfoText
 from terminal_display import TerminalDisplay
+from terra_firma import Land
 
 class LifeDisplay:
     image_save_frequency = 10 # 10 cycles
@@ -21,6 +22,7 @@ class LifeDisplay:
         self.surface = pygame.display.set_mode(display_size)
 
         self.entities = Entities(display_size, self.terminal)
+        self.land = Land(display_size, self.terminal)
 
         self.engine = EntityEngine(self.entities, self.stats, self.terminal)
         self.engine.daemon = True
@@ -37,6 +39,7 @@ class LifeDisplay:
         self.show_health = True
         self.show_sex = True
         self.show_stats_overlay = True
+        self.show_land = True
     # end def
 
     def entity_color(self, entity):
@@ -76,13 +79,31 @@ class LifeDisplay:
         return (r, g, b)
     # end def
 
+    def cell_color(self, entity, nutrient):
+        r = g = b = 0
+
+        if self.show_phenotype or self.show_age or self.show_health or self.show_sex:
+            r, g, b = self.entity_color(entity)
+            if nutrient and self.show_land:
+                n = nutrient.nutrient_level / 100.0
+                r = int(r * n)
+                g = int(g * n)
+                b = int(b * n)
+        elif nutrient and self.show_land:
+            r = g = b = int(255 * nutrient.nutrient_level / 100.0)
+        # end if
+
+        return (r, g, b)
+    # end def
+
     def render_row(self, row_idx):
         for x in range(0, self.display_size[0]):
             pos = Pos(x, row_idx)
             entity = self.entities[pos]
+            nutrient = self.land[pos]
             entity_rect = pygame.Rect(x, row_idx, 1, 1)
             try:
-                pygame.draw.rect(self.surface, self.entity_color(entity), entity_rect)
+                pygame.draw.rect(self.surface, self.cell_color(entity, nutrient), entity_rect)
             except ValueError:
                 print(repr(entity))
                 raise
