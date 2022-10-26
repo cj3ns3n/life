@@ -56,22 +56,22 @@ class TerminalDisplay:
 
         self.scr.addstr(6, 0, 'Refreshes %s' % self.comma_number(stats['display_iterations']))
 
-
-        self.scr.addstr(8, 0, 'Key Commands:')
-        self.scr.addstr(9, 0, '\tESC\t- Close program')
-        self.scr.addstr(10, 0, '\ta\t- Toggle display of age as a color')
-        self.scr.addstr(11, 0, '\tb\t- Toggle display of birth sparkle')
-        self.scr.addstr(12, 0, '\th\t- Toggle display of health as a color')
-        self.scr.addstr(13, 0, '\to\t- Toggle display of stats overlay')
-        self.scr.addstr(14, 0, '\tp\t- Toggle display of phenotype color; overrides other entity colors')
-        self.scr.addstr(15, 0, '\ts\t- Toggle display of sex as a color')
-
         self.terminal_lock.acquire()
         try:
             for i in range(len(self.messages)):
-                self.scr.addstr(17+i, 0, self.messages[i])
+                self.scr.addstr(7+i, 0, self.messages[i])
         finally:
             self.terminal_lock.release()
+
+        commands_line = 14
+        self.scr.addstr(commands_line, 0, 'Key Commands:')
+        self.scr.addstr(commands_line + 1, 0, '\tESC\t- Close program')
+        self.scr.addstr(commands_line + 2, 0, '\ta\t- Toggle display of age as a color')
+        self.scr.addstr(commands_line + 3, 0, '\tb\t- Toggle display of birth sparkle')
+        self.scr.addstr(commands_line + 4, 0, '\th\t- Toggle display of health as a color')
+        self.scr.addstr(commands_line + 5, 0, '\to\t- Toggle display of stats overlay')
+        self.scr.addstr(commands_line + 6, 0, '\tp\t- Toggle display of phenotype color; overrides other entity colors')
+        self.scr.addstr(commands_line + 7, 0, '\ts\t- Toggle display of sex as a color')
 
         self.scr.refresh()
     # end def
