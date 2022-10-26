@@ -86,9 +86,12 @@ class LifeDisplay:
             r, g, b = self.entity_color(entity)
             if nutrient and self.show_land:
                 n = nutrient.nutrient_level / 100.0
-                r = int(r * n)
-                g = int(g * n)
-                b = int(b * n)
+                if r == 0 and g == 0 and b == 0:
+                    r = g = b = int(255 * n)
+                else:
+                    r = int(r * n)
+                    g = int(g * n)
+                    b = int(b * n)
         elif nutrient and self.show_land:
             r = g = b = int(255 * nutrient.nutrient_level / 100.0)
         # end if
