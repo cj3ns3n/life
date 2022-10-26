@@ -97,17 +97,21 @@ class EntityEngine(threading.Thread):
         return len(list(filter(lambda entity: entity.age < entity.mature_age, neighbors))) > 0
     # end def
 
-    def post_entity_progress(self, pos, entity, nutrients, neighbors):
+    def post_entity_progress(self, pos, entity, nutrient, neighbors):
         needed_nutrients = 0
         if entity.health < 100:
             needed_nutrients = min(entity.size, entity.size - (100 - entity.health))
 
         if needed_nutrients > entity.size:
-            self.terminal.add_message('over eating: %s, %s, %s' % (pos, entity, nutrients))
+            self.terminal.add_message('over eating: %s, %s, %s' % (pos, entity, nutrient))
 
-        if nutrients:
-            new_level = nutrients.nutrient_level - needed_nutrients
-            nutrients.nutrient_level = max(0, new_level)
+        if nutrient:
+            new_level = nutrient.nutrient_level - needed_nutrients
+            if new_level <= 0:
+                self.land[pos] = None
+                self.stats.remove_nutrient_source()
+            else:
+                nutrient.nutrient_level = new_level
         else:
             new_level = -needed_nutrients
         # end if
@@ -168,6 +172,7 @@ class EntityEngine(threading.Thread):
                 nutrients.nutrient_level = min(100, nutrients.nutrient_level + amount)
             else:
                 self.land[next_pos] = Food(init_nutrients = amount)
+                self.stats.increment_nutrient_sources()
         except IndexError:
             self.terminal.add_message('bad food index %s - %s' % (repr(pos), repr(next_pos)))
 
@@ -194,7 +199,7 @@ class EntityEngine(threading.Thread):
                 for x in x_positions:
                     pos = Pos(x, y)
                     entity = self.entities[pos]
-                    nutrients = self.land[pos]
+                    nutrient = self.land[pos]
 
                     if entity is not None and entity.health > 0:
                         if entity.cycle < self.stats.cycles:
@@ -209,7 +214,7 @@ class EntityEngine(threading.Thread):
                             entity.progress(neighbors, self.stats.cycles)
                             if entity.health > 0.0:
                                 self.stats.add_entity_stats(entity)
-                                self.post_entity_progress(pos, entity, nutrients, neighbors)
+                                self.post_entity_progress(pos, entity, nutrient, neighbors)
                             else:
                                 self.stats.increment_natural_deaths(entity)
                                 #self.terminal.add_message('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))
@@ -217,8 +222,9 @@ class EntityEngine(threading.Thread):
                         # end if
                     # end if
 
-                    if nutrients:
-                        self.post_nutrient_progress(nutrients, pos)
+                    if nutrient and nutrient.nutrient_level > 0:
+                        self.post_nutrient_progress(nutrient, pos)
+                        self.stats.add_nutrient_stats(nutrient)
                 # end for x
 
                 self.processed_rows.add(y)

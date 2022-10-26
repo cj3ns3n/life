@@ -54,7 +54,9 @@ class TerminalDisplay:
 
         self.scr.addstr(5, 0, 'Avg Size: %.1f, Stdv Size: %.1f' % (stats['size_avg'], stats['size_stdev']))
 
-        self.scr.addstr(6, 0, 'Refreshes %s' % self.comma_number(stats['display_iterations']))
+        self.scr.addstr(6, 0, 'Nutrient Sources: %s, Avg Nutrient Level: %.1f, Stdv Nutrient Level: %.1f' % (self.comma_number(stats['nutrient_sources']), stats['nutrient_level_avg'], stats['nutrient_level_stdev']))
+
+        self.scr.addstr(7, 0, 'Refreshes %s' % self.comma_number(stats['display_iterations']))
 
         self.terminal_lock.acquire()
         try:
@@ -63,7 +65,7 @@ class TerminalDisplay:
         finally:
             self.terminal_lock.release()
 
-        commands_line = 14
+        commands_line = 15
         self.scr.addstr(commands_line, 0, 'Key Commands:')
         self.scr.addstr(commands_line + 1, 0, '\tESC\t- Close program')
         self.scr.addstr(commands_line + 2, 0, '\ta\t- Toggle display of age as a color')

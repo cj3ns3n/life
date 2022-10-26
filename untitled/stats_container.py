@@ -5,29 +5,34 @@ from entity import Entity
 
 class StatsContainer:
     def __init__(self):
-        self.ages = []
-        self.healths = []
-        self.sizes = []
+        self.ages            = []
+        self.healths         = []
+        self.sizes           = []
+        self.nutrient_levels = []
 
-        self.age_avg = 0
-        self.age_stdev = 0
-        self.health_avg = 0
+        self.age_avg      = 0
+        self.age_stdev    = 0
+        self.health_avg   = 0
         self.health_stdev = 0
-        self.size_avg = 0
-        self.size_stdev = 0
+        self.size_avg     = 0
+        self.size_stdev   = 0
 
-        self.cycles = 0
-        self.births_count = 0
-        self.males_count = 0
-        self.female_count = 0
-        self.natural_deaths = 0
-        self.maternal_deaths = 0
+        self.cycles             = 0
+        self.births_count       = 0
+        self.males_count        = 0
+        self.female_count       = 0
+        self.natural_deaths     = 0
+        self.maternal_deaths    = 0
         self.display_iterations = 0
 
         self.cycle_births = 0
-        self.birth_rate = 0.0
+        self.birth_rate   = 0.0
         self.cycle_deaths = 0
-        self.death_rate = 0.0
+        self.death_rate   = 0.0
+
+        self.nutrient_sources     = 0
+        self.nutrient_level_avg   = 0
+        self.nutrient_level_stdev = 0
     # end init
 
     def get_stats(self):
@@ -48,6 +53,9 @@ class StatsContainer:
         stats['display_iterations'] = self.display_iterations
         stats['death_rate'] = self.death_rate
         stats['birth_rate'] = self.birth_rate
+        stats['nutrient_sources'] = self.nutrient_sources
+        stats['nutrient_level_avg'] = self.nutrient_level_avg
+        stats['nutrient_level_stdev'] = self.nutrient_level_stdev
 
         return stats
     # end def
@@ -65,9 +73,26 @@ class StatsContainer:
             self.ages = []
             self.healths = []
             self.sizes = []
-
-            self.calculating = False
         # end if
+
+        if len(self.nutrient_levels) > 1:
+            self.nutrient_level_avg = statistics.mean(self.nutrient_levels)
+            self.nutrient_level_stdev = statistics.stdev(self.nutrient_levels)
+
+            self.nutrient_levels = []
+        # end if
+    # end def
+
+    def increment_nutrient_sources(self):
+        self.nutrient_sources += 1
+    # end if
+
+    def remove_nutrient_source(self):
+        self.nutrient_sources -= 1
+    # end def
+
+    def add_nutrient_stats(self, nutrient):
+        self.nutrient_levels.append(nutrient.nutrient_level)
     # end def
 
     def add_entity_stats(self, entity):
