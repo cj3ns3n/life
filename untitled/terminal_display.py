@@ -27,22 +27,25 @@ class TerminalDisplay:
                 self.messages = self.messages[-5:]
         finally:
             self.terminal_lock.release()
+    # end def
 
+    def comma_number(self, number):
+        return "{:,}".format(number)
     # end def
 
     def run(self):
         stats = self.stats_container.get_stats()
 
-        self.scr.addstr(0, 0, "Cycles: %d" % stats['cycles'])
+        self.scr.addstr(0, 0, "Cycles: %s" % self.comma_number(stats['cycles']))
 
-        pop_text_str = 'Population %03d; Males %03d; Females %03d' % (stats['births'] - stats['maternal_deaths'] - stats['natural_deaths'], stats['males'], stats['females'])
+        pop_text_str = 'Population %s; Males %s; Females %s' % (self.comma_number(stats['births'] - stats['maternal_deaths'] - stats['natural_deaths']), self.comma_number(stats['males']), self.comma_number(stats['females']))
         self.scr.addstr(1, 0, pop_text_str)
 
         births = stats['births']
         m_deaths = stats['maternal_deaths']
         n_deaths = stats['natural_deaths']
         m_deathrate = 100.0 * float(m_deaths) / float(births) if births > 0 else 0.0
-        births_text_str = 'Births: %02d; (birth rate: %0.1f) Maternal Deaths: %02d (rate: %0.1f%%); Natural Deaths: %02d (death rate: %0.1f%%)' % (births, stats['birth_rate']*100, m_deaths, m_deathrate, n_deaths, stats['death_rate']*100)
+        births_text_str = 'Births: %s; (birth rate: %0.1f) Maternal Deaths: %s (rate: %0.1f%%); Natural Deaths: %s (death rate: %0.1f%%)' % (self.comma_number(births), stats['birth_rate']*100, self.comma_number(m_deaths), m_deathrate, self.comma_number(n_deaths), stats['death_rate']*100)
         self.scr.addstr(2, 0, births_text_str)
 
         self.scr.addstr(3, 0, 'Avg Age: %.1f, Stdv Age: %.1f' % (stats['age_avg'], stats['age_stdev']))
@@ -51,7 +54,7 @@ class TerminalDisplay:
 
         self.scr.addstr(5, 0, 'Avg Size: %.1f, Stdv Size: %.1f' % (stats['size_avg'], stats['size_stdev']))
 
-        self.scr.addstr(6, 0, 'Refreshes %d' % stats['display_iterations'])
+        self.scr.addstr(6, 0, 'Refreshes %s' % self.comma_number(stats['display_iterations']))
 
 
         self.scr.addstr(8, 0, 'Key Commands:')
