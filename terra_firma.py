@@ -1,5 +1,5 @@
 import random
-from food import Food
+from nutrient import Nutrient
 
 class Land:
     def __init__(self, size, logger, food_likelyhood=0.01):
@@ -17,7 +17,7 @@ class Land:
             row = []
             for x in range(self.width):
                 if random.random() < food_likelyhood:
-                    row.append(Food())
+                    row.append(Nutrient())
                 else:
                     row.append(None)
             # end for

@@ -3,7 +3,7 @@ import random
 import numpy
 from pos import Pos
 from entity import Entity
-from food import Food
+from nutrient import Nutrient
 
 class EntityEngine(threading.Thread):
     def __init__(self, entities, land, stats_container, logger):
@@ -175,7 +175,7 @@ class EntityEngine(threading.Thread):
             if nutrients:
                 nutrients.nutrient_level = min(100, nutrients.nutrient_level + amount)
             else:
-                self.land[next_pos] = Food(init_nutrients = amount)
+                self.land[next_pos] = Nutrient(init_nutrients = amount)
                 self.stats.increment_nutrient_sources()
         except IndexError:
             self.logger.error('bad food index %s - %s' % (repr(pos), repr(next_pos)), True)
