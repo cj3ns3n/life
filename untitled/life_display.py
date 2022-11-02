@@ -3,9 +3,7 @@ from pos import Pos
 from entity import Entity
 from entities import Entities
 from entity_engine import EntityEngine
-from stats_container import StatsContainer
 from info_text import InfoText
-from terminal_display import TerminalDisplay
 from terra_firma import Land
 from logger import Logger
 
@@ -13,13 +11,12 @@ from logger import Logger
 class LifeDisplay:
     image_save_frequency = 10 # 10 cycles
 
-    def __init__(self, display_size = (600, 300)):
+    def __init__(self, stats, logger, display_size = (600, 300)):
         pygame.init()
 
-        self.stats = StatsContainer()
+        self.stats = stats
         self.infoText = InfoText()
-        self.terminal = TerminalDisplay(self.stats)
-        self.logger = Logger(self.terminal, __name__, 'life.log')
+        self.logger = logger
 
         self.display_size = display_size
         self.surface = pygame.display.set_mode(display_size)
@@ -142,8 +139,6 @@ class LifeDisplay:
     # end def
 
     def display(self):
-        self.terminal.run()
-
         game_running = True
         last_mouse_pos = Pos(0, 0)
 
@@ -172,7 +167,7 @@ class LifeDisplay:
                     pygame.display.update(self.infoText.get_rect())
             # end if
 
-            self.terminal.run()
+            self.logger.refresh_terminal()
 
             # save periodic image
             if self.stats.cycles % LifeDisplay.image_save_frequency == 0:
@@ -181,7 +176,7 @@ class LifeDisplay:
             # end if
 
             self.stats.increment_display_iterations()
-            self.logger.info('display refreshes: %d' % self.stats.display_iterations)
+            #self.logger.info('display refreshes: %d' % self.stats.display_iterations)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -215,7 +210,7 @@ class LifeDisplay:
                 self.infoText.set_entity(self.entities[mouse_pos], mouse_pos)
         # end while
 
-        self.terminal.shutdown()
+        self.logger.shutdown()
         pygame.quit()
         exit()
     #end def

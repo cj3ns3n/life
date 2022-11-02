@@ -10,6 +10,14 @@ class Logger:
         self.logger = logging.getLogger(name)
     # end def
 
+    def refresh_terminal(self):
+        self.terminal_display.run()
+    # end def
+
+    def shutdown(self):
+        self.terminal_display.shutdown()
+    # end def
+
     def debug(self, message, terminal = False):
         self.logger.debug(message)
         if terminal:
