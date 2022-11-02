@@ -7,6 +7,8 @@ from stats_container import StatsContainer
 from info_text import InfoText
 from terminal_display import TerminalDisplay
 from terra_firma import Land
+from logger import Logger
+
 
 class LifeDisplay:
     image_save_frequency = 10 # 10 cycles
@@ -17,14 +19,15 @@ class LifeDisplay:
         self.stats = StatsContainer()
         self.infoText = InfoText()
         self.terminal = TerminalDisplay(self.stats)
+        self.logger = Logger(self.terminal, __name__, 'life.log')
 
         self.display_size = display_size
         self.surface = pygame.display.set_mode(display_size)
 
-        self.entities = Entities(display_size, self.terminal)
-        self.land = Land(display_size, self.terminal)
+        self.entities = Entities(display_size, self.logger.get_logger(Entities.__name__))
+        self.land = Land(display_size, self.logger.get_logger(Land.__name__))
 
-        self.engine = EntityEngine(self.entities, self.land, self.stats, self.terminal)
+        self.engine = EntityEngine(self.entities, self.land, self.stats, self.logger.get_logger(EntityEngine.__name__))
         self.engine.daemon = True
         self.engine.start()
 
@@ -38,7 +41,7 @@ class LifeDisplay:
         self.show_sparkles = True
         self.show_health = True
         self.show_sex = True
-        self.show_stats_overlay = True
+        self.show_stats_overlay = False
         self.show_land = True
     # end def
 
@@ -108,8 +111,7 @@ class LifeDisplay:
             try:
                 pygame.draw.rect(self.surface, self.cell_color(entity, nutrient), entity_rect)
             except ValueError:
-                print(repr(entity))
-                raise
+                self.logger.error('draw.rect ValueError %s' % repr(entity), True)
             # end try
 
             if self.show_sparkles and entity and entity.age == 0:
@@ -147,6 +149,7 @@ class LifeDisplay:
 
         self.render_rows((0, self.display_size[1]))
 
+        self.logger.info('display started')
         first = True
         while game_running:
             if first:
@@ -178,6 +181,7 @@ class LifeDisplay:
             # end if
 
             self.stats.increment_display_iterations()
+            self.logger.info('display refreshes: %d' % self.stats.display_iterations)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

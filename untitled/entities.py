@@ -3,11 +3,11 @@ from entity import Entity
 import random
 
 class Entities:
-    def __init__(self, size, terminal, life_likelyhood=0.05):
+    def __init__(self, size, logger, life_likelyhood=0.05):
         self.size = size
         self.width = size[0]
         self.height = size[1]
-        self.terminal = terminal
+        self.logger = logger
         #self.entities = self.adam_eve(size, Pos(200, 150))
         self.entities = self.birth_entities(size, life_likelyhood)
     # end def
@@ -79,7 +79,7 @@ class Entities:
             neighbors.append(self[Pos(pos.x, pos.y+1)])
 
         if len(neighbors) > 4:
-            self.terminal.add_message('lots o neighbors: %d', len(neighbors))
+            self.logger.warn('lots o neighbors: %d', len(neighbors), True)
         return list(filter(lambda n: n is not None and n.health > 0.0, neighbors))
     # end def
 

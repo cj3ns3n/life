@@ -2,11 +2,11 @@ import random
 from food import Food
 
 class Land:
-    def __init__(self, size, terminal, food_likelyhood=0.01):
+    def __init__(self, size, logger, food_likelyhood=0.01):
         self.size = size
         self.width = size[0]
         self.height = size[1]
-        self.terminal = terminal
+        self.logger = logger
 
         self.land = self.terraformation(food_likelyhood)
     # end def

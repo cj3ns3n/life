@@ -23,6 +23,7 @@ class StatsContainer:
         self.female_count       = 0
         self.natural_deaths     = 0
         self.maternal_deaths    = 0
+        self.starvation_deaths  = 0
         self.display_iterations = 0
 
         self.cycle_births = 0
@@ -46,6 +47,7 @@ class StatsContainer:
         stats['size_stdev'] = self.size_stdev
         stats['births'] = self.births_count
         stats['natural_deaths'] = self.natural_deaths
+        stats['starvation_deaths'] = self.starvation_deaths
         stats['maternal_deaths'] = self.maternal_deaths
         stats['males'] = self.males_count
         stats['females'] = self.female_count
@@ -127,7 +129,16 @@ class StatsContainer:
 
     def increment_natural_deaths(self, entity):
         self.natural_deaths += 1
-        self.cycle_deaths == 1
+        self.cycle_deaths += 1
+        if entity.sex == Entity.MALE:
+            self.males_count -= 1
+        else:
+            self.female_count -= 1
+    # end def
+
+    def increment_starvations(self, entity):
+        self.starvation_deaths += 1
+        self.cycle_deaths += 1
         if entity.sex == Entity.MALE:
             self.males_count -= 1
         else:

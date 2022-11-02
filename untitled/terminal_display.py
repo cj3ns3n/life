@@ -44,8 +44,10 @@ class TerminalDisplay:
         births = stats['births']
         m_deaths = stats['maternal_deaths']
         n_deaths = stats['natural_deaths']
+        s_deaths = stats['starvation_deaths']
         m_deathrate = 100.0 * float(m_deaths) / float(births) if births > 0 else 0.0
-        births_text_str = 'Births: %s; (birth rate: %0.1f) Maternal Deaths: %s (rate: %0.1f%%); Natural Deaths: %s (death rate: %0.1f%%)' % (self.comma_number(births), stats['birth_rate']*100, self.comma_number(m_deaths), m_deathrate, self.comma_number(n_deaths), stats['death_rate']*100)
+        births_text_str = 'Births: %s; (birth rate: %0.1f) Maternal Deaths: %s (rate: %0.1f%%); Starvation Deaths: %s; Natural Deaths: %s (death rate: %0.1f%%)' % \
+                          (self.comma_number(births), stats['birth_rate']*100, self.comma_number(m_deaths), m_deathrate, self.comma_number(s_deaths), self.comma_number(n_deaths), stats['death_rate']*100)
         self.scr.addstr(2, 0, births_text_str)
 
         self.scr.addstr(3, 0, 'Avg Age: %.1f, Stdv Age: %.1f' % (stats['age_avg'], stats['age_stdev']))
@@ -61,7 +63,7 @@ class TerminalDisplay:
         self.terminal_lock.acquire()
         try:
             for i in range(len(self.messages)):
-                self.scr.addstr(7+i, 0, self.messages[i])
+                self.scr.addstr(9+i, 0, self.messages[i])
         finally:
             self.terminal_lock.release()
 
