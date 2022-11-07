@@ -1,11 +1,9 @@
 import pygame
 from pos import Pos
 from entity import Entity
-from entities import Entities
 from entity_engine import EntityEngine
 from info_text import InfoText
 from terra_firma import Land
-from logger import Logger
 
 
 class LifeDisplay:
@@ -21,10 +19,9 @@ class LifeDisplay:
         self.display_size = display_size
         self.surface = pygame.display.set_mode(display_size)
 
-        self.entities = Entities(display_size, self.logger.get_logger(Entities.__name__))
         self.land = Land(display_size, self.logger.get_logger(Land.__name__))
 
-        self.engine = EntityEngine(self.entities, self.land, self.stats, self.logger.get_logger(EntityEngine.__name__))
+        self.engine = EntityEngine(self.land, self.stats, self.logger.get_logger(EntityEngine.__name__))
         self.engine.daemon = True
         self.engine.start()
 
@@ -73,28 +70,33 @@ class LifeDisplay:
             # end if
 
             if r < 0 or r > 255 or g < 0 or g > 255 or b < 0 or b > 255:
-                self.terminal.add_message('bad color: %s: %s' % (str((r, g, b)), str(entity)))
+                self.logger.error('bad color: %s: %s' % (str((r, g, b)), str(entity)), True)
         # end if
 
         return (r, g, b)
     # end def
 
-    def cell_color(self, entity, nutrient):
+    def cell_color(self, cell):
         r = g = b = 0
+        nutrient = cell.nutrient
+        entity = cell.entity
 
-        if self.show_phenotype or self.show_age or self.show_health or self.show_sex:
-            r, g, b = self.entity_color(entity)
-            if nutrient and self.show_land:
-                n = nutrient.nutrient_level / 100.0
-                if r == 0 and g == 0 and b == 0:
-                    r = g = b = int(255 * n)
-                else:
-                    r = int(r * n)
-                    g = int(g * n)
-                    b = int(b * n)
-        elif nutrient and self.show_land:
-            r = g = b = int(255 * nutrient.nutrient_level / 100.0)
-        # end if
+        try:
+            if self.show_phenotype or self.show_age or self.show_health or self.show_sex:
+                r, g, b = self.entity_color(entity)
+                if nutrient and self.show_land:
+                    n = nutrient.nutrient_level / 100.0
+                    if r == 0 and g == 0 and b == 0:
+                        r = g = b = int(255 * n)
+                    else:
+                        r = int(r * n)
+                        g = int(g * n)
+                        b = int(b * n)
+            elif nutrient and self.show_land:
+                r = g = b = int(255 * nutrient.nutrient_level / 100.0)
+            # end if
+        except Exception as ex:
+            self.logger.error('cell color error: %s - %s' % (entity, nutrient))
 
         return (r, g, b)
     # end def
@@ -102,17 +104,16 @@ class LifeDisplay:
     def render_row(self, row_idx):
         for x in range(0, self.display_size[0]):
             pos = Pos(x, row_idx)
-            entity = self.entities[pos]
-            nutrient = self.land[pos]
-            entity_rect = pygame.Rect(x, row_idx, 1, 1)
+            cell = self.land[pos]
+            cell_rect = pygame.Rect(x, row_idx, 1, 1)
             try:
-                pygame.draw.rect(self.surface, self.cell_color(entity, nutrient), entity_rect)
+                pygame.draw.rect(self.surface, self.cell_color(cell), cell_rect)
             except ValueError:
-                self.logger.error('draw.rect ValueError %s' % repr(entity), True)
+                self.logger.error('draw.rect ValueError %s' % repr(pos), True)
             # end try
 
-            if self.show_sparkles and entity and entity.age == 0:
-                # show burst for new borns
+            if self.show_sparkles and cell.entity and cell.entity.age == 0:
+                # show burst for newborns
                 self.render_burst(pos)
         # end for
     # end def
@@ -207,7 +208,7 @@ class LifeDisplay:
             if mouse_pos != last_mouse_pos:
                 last_mouse_pos = mouse_pos
                 #self.terminal.add_message('mouse position %s' % repr(mouse_pos))
-                self.infoText.set_entity(self.entities[mouse_pos], mouse_pos)
+                self.infoText.set_entity(self.land.get_entity(mouse_pos), mouse_pos)
         # end while
 
         self.logger.shutdown()

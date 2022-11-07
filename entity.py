@@ -1,8 +1,9 @@
 import numpy as np
 import random
 import math
-
 import numpy.random
+
+
 
 class Entity:
     FEMALE = 'f'
@@ -80,7 +81,7 @@ class Entity:
         try:
             # y=40 log(-x+100)+20  logarithmic decline to 100
             fated_health = 40 * math.log(-self.age + self.life_expectancy, 10) + self.initial_health_factor
-            live_neighbors = list(filter(lambda entity: entity is not None and entity.health > 0, neighbors))
+            live_neighbors = list(filter(lambda neighbor: neighbor is not None and neighbor.health > 0, neighbors))
             if len(live_neighbors) > 0:
                 local_health = sum(neighbor.health for neighbor in live_neighbors) / len(live_neighbors)
                 new_health = (self.health + fated_health + local_health) / 3
@@ -93,7 +94,7 @@ class Entity:
 
     def calc_eternal_health(self, neighbors):
         if self.health > 0:
-            live_neighbors = list(filter(lambda entity: entity.health > 0, neighbors))
+            live_neighbors = list(filter(lambda neighbor: neighbor.health > 0, neighbors))
             if len(live_neighbors) > 0:
                 local_health = (sum(neighbor.health for neighbor in live_neighbors) + self.health) / (len(live_neighbors) + 1)
                 local_size = (sum(neighbor.size for neighbor in live_neighbors) + self.size) / (len(live_neighbors) + 1)

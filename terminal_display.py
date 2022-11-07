@@ -100,7 +100,7 @@ if __name__ == "__main__":
     import time
 
     stats = DummyStats()
-    terminal = TerminalDisplay()
+    terminal = TerminalDisplay(stats)
 
     for i in range(10):
         terminal.run(stats)

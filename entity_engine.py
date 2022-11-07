@@ -4,13 +4,13 @@ import numpy
 from pos import Pos
 from entity import Entity
 from nutrient import Nutrient
+from terra_firma import Land
 
 class EntityEngine(threading.Thread):
-    def __init__(self, entities, land, stats_container, logger):
+    def __init__(self, land, stats_container, logger):
         threading.Thread.__init__(self)
 
-        self.entities = entities
-        self.land = land
+        self.lando = land
         self.processed_rows = set()
         self.stats = stats_container
         self.logger = logger
@@ -23,7 +23,7 @@ class EntityEngine(threading.Thread):
     # end def
 
     def get_vacant_position(self, pos, preferred_dir):
-        vacant_positions = self.entities.get_vacant_neighbor_positions(pos)
+        vacant_positions = self.lando.get_vacant_neighbor_positions(pos)
 
         if len(vacant_positions) == 1:
             return vacant_positions[0]
@@ -105,7 +105,7 @@ class EntityEngine(threading.Thread):
                 new_level = nutrient.nutrient_level - needed_nutrients
                 #self.logger.info('new nutrient level: %0.1f %s %s %s' % (new_level, repr(nutrient), repr(entity), pos))
                 if new_level <= 0:
-                    self.land[pos] = None
+                    self.lando[pos].nutrient = None
                     self.stats.remove_nutrient_source()
                 else:
                     nutrient.nutrient_level = new_level
@@ -132,7 +132,7 @@ class EntityEngine(threading.Thread):
 
                 if best_mate:
                     child = Entity(self.stats.cycles, (entity, best_mate))
-                    self.entities[new_pos] = child
+                    self.lando[new_pos].entity = child
                     self.stats.increment_births(child)
                     #self.terminal.add_message('birth %s; %d; %d' % (repr(pos), child.mature_age, self.stats.births_count))
 
@@ -150,8 +150,8 @@ class EntityEngine(threading.Thread):
                     return child
                 elif not self.child_exists(neighbors):
                     # find new pos
-                    self.entities[new_pos] = entity
-                    self.entities[pos] = None
+                    self.lando[new_pos].entity = entity
+                    self.lando[pos].entity = None
 
                     if new_pos.y != pos.y:
                         self.processed_rows.add(new_pos.y)
@@ -161,8 +161,8 @@ class EntityEngine(threading.Thread):
     # end def
 
     def get_random_neighbor(self, pos):
-        x = max(0, min(self.land.width-1, pos.x + random.randint(0, 1)))
-        y = max(0, min(self.land.height-1, pos.y + random.randint(-1, 1)))
+        x = max(0, min(self.lando.width-1, pos.x + random.randint(0, 1)))
+        y = max(0, min(self.lando.height-1, pos.y + random.randint(-1, 1)))
 
         return Pos(x, y)
     # end def
@@ -171,11 +171,11 @@ class EntityEngine(threading.Thread):
         try:
             next_pos = self.get_random_neighbor(pos)
             #self.logger.info('spreading nutrients: %f; %s' % (amount, pos))
-            nutrients = self.land[next_pos]
+            nutrients = self.lando[next_pos].nutrient
             if nutrients:
                 nutrients.nutrient_level = min(100, nutrients.nutrient_level + amount)
             else:
-                self.land[next_pos] = Nutrient(init_nutrients = amount)
+                self.lando[next_pos].nutrient = Nutrient(init_nutrients = amount)
                 self.stats.increment_nutrient_sources()
         except IndexError:
             self.logger.error('bad food index %s - %s' % (repr(pos), repr(next_pos)), True)
@@ -195,19 +195,20 @@ class EntityEngine(threading.Thread):
             stats_thread = None
 
             # shuffle the processing of rows and columns to avoid bias artifacts
-            y_positions = list(range(self.entities.height))
+            y_positions = list(range(self.lando.height))
             random.shuffle(y_positions)
             for y in y_positions:
-                x_positions = list(range(self.entities.width))
+                x_positions = list(range(self.lando.width))
                 random.shuffle(x_positions)
                 for x in x_positions:
                     pos = Pos(x, y)
-                    entity = self.entities[pos]
-                    nutrient = self.land[pos]
+                    cell = self.lando[pos]
+                    entity = cell.entity
+                    nutrient = cell.nutrient
 
                     if entity is not None and entity.health > 0:
                         if entity.cycle < self.stats.cycles:
-                            neighbors = self.entities.get_neighbors(pos)
+                            neighbors = self.lando.get_neighbors(pos)
                             random.shuffle(neighbors)
                             if self.stats.cycles == 0:
                                 # add initial entities to births
