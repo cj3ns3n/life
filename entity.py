@@ -3,7 +3,7 @@ import random
 import math
 import numpy.random
 
-
+from cell import Cell
 
 class Entity:
     FEMALE = 'f'
@@ -76,8 +76,10 @@ class Entity:
         return self.calc_health()
     # end def
 
-    def calc_health(self, neighbors=[]):
+    def calc_health(self, neighbor_cells=[]):
+        neighbors = Cell.extract_entities(neighbor_cells)
         new_health = self.health
+
         try:
             # y=40 log(-x+100)+20  logarithmic decline to 100
             fated_health = 40 * math.log(-self.age + self.life_expectancy, 10) + self.initial_health_factor
@@ -92,10 +94,10 @@ class Entity:
         return min(100, max(0, new_health))
     # end def
 
-    def progress(self, neighbors, cycle):
+    def progress(self, neighbor_cells, cycle):
         self.cycle = cycle
         self.age += 1
-        self.health = self.calc_health(neighbors)
+        self.health = self.calc_health(neighbor_cells)
         if self.health > 50:
             # randomly grow or shrink
             self.size = max(0.1, np.random.normal(self.size, self.size/10.0))

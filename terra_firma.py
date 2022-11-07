@@ -43,21 +43,18 @@ class Land:
         return land
     # end def
 
-    def get_neighbors(self, pos):
+    def get_neighbors_cells(self, pos):
         neighbors = []
         if pos.x > 0:  # left neighbor
-            neighbors.append(self[Pos(pos.x-1, pos.y)].entity)
+            neighbors.append(self[Pos(pos.x-1, pos.y)])
         if pos.x < self.width - 1:  # right neighbor
-            neighbors.append(self[Pos(pos.x+1, pos.y)].entity)
+            neighbors.append(self[Pos(pos.x+1, pos.y)])
         if pos.y > 0:  # top neighbor
-            neighbors.append(self[Pos(pos.x, pos.y-1)].entity)
+            neighbors.append(self[Pos(pos.x, pos.y-1)])
         if pos.y < self.height - 1:  # bottom neighbor
-            neighbors.append(self[Pos(pos.x, pos.y+1)].entity)
+            neighbors.append(self[Pos(pos.x, pos.y+1)])
 
-        if len(neighbors) > 4:
-            self.logger.warn('lots o neighbors: %d', len(neighbors), True)
-
-        return list(filter(lambda n: n is not None and n.health > 0.0, neighbors))
+        return neighbors
     # end def
 
     def get_vacant_neighbor_positions(self, pos):

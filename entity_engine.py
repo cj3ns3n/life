@@ -4,7 +4,7 @@ import numpy
 from pos import Pos
 from entity import Entity
 from nutrient import Nutrient
-from terra_firma import Land
+from cell import Cell
 
 class EntityEngine(threading.Thread):
     def __init__(self, land, stats_container, logger):
@@ -97,7 +97,7 @@ class EntityEngine(threading.Thread):
         return len(list(filter(lambda entity: entity.age < entity.mature_age, neighbors))) > 0
     # end def
 
-    def post_entity_progress(self, pos, entity, nutrient, neighbors):
+    def post_entity_progress(self, pos, entity, nutrient, neighbor_cells):
         if entity.health < 100:
             needed_nutrients = entity.size
 
@@ -123,6 +123,7 @@ class EntityEngine(threading.Thread):
             # end if
         # end if
 
+        neighbors = list(Cell.extract_entities(neighbor_cells))
         if len(neighbors) < 4 and entity.age >= entity.mature_age:
             new_pos = self.get_vacant_position(pos, entity.preferred_direction)
             if new_pos:
@@ -208,18 +209,17 @@ class EntityEngine(threading.Thread):
 
                     if entity is not None and entity.health > 0:
                         if entity.cycle < self.stats.cycles:
-                            neighbors = self.land.get_neighbors(pos)
-                            random.shuffle(neighbors)
+                            neighbor_cells = self.land.get_neighbors_cells(pos)
+                            random.shuffle(neighbor_cells)
                             if self.stats.cycles == 0:
                                 # add initial entities to births
                                 self.stats.increment_births(entity)
-                                #self.terminal.add_message('birth: %s; %d' % (repr(pos), self.stats.births_count))
                             # end if
 
-                            entity.progress(neighbors, self.stats.cycles)
+                            entity.progress(neighbor_cells, self.stats.cycles)
                             if entity.health > 0.0:
                                 self.stats.add_entity_stats(entity)
-                                self.post_entity_progress(pos, entity, nutrient, neighbors)
+                                self.post_entity_progress(pos, entity, nutrient, neighbor_cells)
                             else:
                                 self.stats.increment_natural_deaths(entity)
                                 self.logger.info('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))

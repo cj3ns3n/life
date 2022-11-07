@@ -9,6 +9,12 @@ class Cell:
         self.nutrient = nutrient
     # end def
 
+    @staticmethod
+    def extract_entities(cells):
+        entity_cells = filter(lambda cell: cell.entity, cells)
+        return map(lambda cell: cell.entity, entity_cells)
+    # end def
+
     def __setitem__(self, key, value):
         if key == Cell.NUTRIENT_KEY:
             self.nutrient = value
