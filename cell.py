@@ -10,6 +10,10 @@ class Cell:
         self.nutrient = nutrient
     # end def
 
+    def nutrient_level(self):
+        return 0 if self.nutrient is None else self.nutrient.nutrient_level
+    # end def
+
     @staticmethod
     def extract_entity_cells(cells):
         entity_cells = filter(lambda cell: cell.entity, cells)

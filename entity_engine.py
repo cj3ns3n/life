@@ -79,9 +79,8 @@ class EntityEngine(threading.Thread):
         if entity.age >= entity.mature_age:
             best_dist = 10000
             for neighbor_cell in neighbor_cells:
-                neighbor_nutrient = neighbor_cell.nutrient
                 neighbor_entity = neighbor_cell.entity
-                if neighbor_nutrient and neighbor_nutrient.nutrient_level > 0 and neighbor_entity and neighbor_entity.sex != entity.sex and neighbor_entity.age >= neighbor_entity.mature_age:
+                if neighbor_cell.nutrient_level() > 0 and neighbor_entity and neighbor_entity.sex != entity.sex and neighbor_entity.age >= neighbor_entity.mature_age:
                     if self.incest_check(entity, neighbor_entity):
                         dist = self.entity_dist(entity, neighbor_entity)
                         if dist < best_dist:
