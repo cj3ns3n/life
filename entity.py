@@ -92,25 +92,6 @@ class Entity:
         return min(100, max(0, new_health))
     # end def
 
-    def calc_eternal_health(self, neighbors):
-        if self.health > 0:
-            live_neighbors = list(filter(lambda neighbor: neighbor.health > 0, neighbors))
-            if len(live_neighbors) > 0:
-                local_health = (sum(neighbor.health for neighbor in live_neighbors) + self.health) / (len(live_neighbors) + 1)
-                local_size = (sum(neighbor.size for neighbor in live_neighbors) + self.size) / (len(live_neighbors) + 1)
-            else:
-                local_health = self.health
-                local_size = self.size
-            # end if
-
-            self.health = self.calc_health()
-            self.size = max(0.1, np.random.normal(local_size, Entity.size_range))
-
-            if 0 < len(live_neighbors) < len(neighbors):
-                return self.procreate(live_neighbors)
-        # end if
-    # end def
-
     def progress(self, neighbors, cycle):
         self.cycle = cycle
         self.age += 1
