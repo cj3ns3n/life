@@ -111,10 +111,10 @@ class StatsContainer:
         self.cycles += 1
 
         population = self.births_count - self.maternal_deaths - self.natural_deaths
-        self.birth_rate = float(self.cycle_births) / float(population)
+        self.birth_rate = 0 if population == 0 else float(self.cycle_births) / float(population)
         self.cycle_births = 0
 
-        self.death_rate = float(self.cycle_deaths) / float(population)
+        self.death_rate = 0 if population == 0 else float(self.cycle_deaths) / float(population)
         self.cycle_deaths = 0
     # end def
 

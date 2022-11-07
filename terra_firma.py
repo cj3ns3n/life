@@ -34,7 +34,7 @@ class Land:
         for y in range(self.height):
             row = []
             for x in range(self.width):
-                cell = Cell(self.create_entity(life_likelyhood), self.create_nutrient(food_likelyhood))
+                cell = Cell(Pos(x, y), self.create_entity(life_likelyhood), self.create_nutrient(food_likelyhood))
                 row.append(cell)
             # end for
             land.append(row)

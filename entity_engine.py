@@ -73,18 +73,20 @@ class EntityEngine(threading.Thread):
         return True
     # end def
 
-    def find_mate(self, entity, neighbors):
+    def find_mate(self, entity, neighbor_cells):
         best_mate = None
 
         if entity.age >= entity.mature_age:
             best_dist = 10000
-            for neighbor in neighbors:
-                if neighbor.sex != entity.sex and neighbor.age >= neighbor.mature_age:
-                    if self.incest_check(entity, neighbor):
-                        dist = self.entity_dist(entity, neighbor)
+            for neighbor_cell in neighbor_cells:
+                neighbor_nutrient = neighbor_cell.nutrient
+                neighbor_entity = neighbor_cell.entity
+                if neighbor_nutrient and neighbor_nutrient.nutrient_level > 0 and neighbor_entity and neighbor_entity.sex != entity.sex and neighbor_entity.age >= neighbor_entity.mature_age:
+                    if self.incest_check(entity, neighbor_entity):
+                        dist = self.entity_dist(entity, neighbor_entity)
                         if dist < best_dist:
                             best_dist = dist
-                            best_mate = neighbor
+                            best_mate = neighbor_entity
                     # end if
                 # end if
             # end for
@@ -97,7 +99,11 @@ class EntityEngine(threading.Thread):
         return len(list(filter(lambda entity: entity.age < entity.mature_age, neighbors))) > 0
     # end def
 
-    def post_entity_progress(self, pos, entity, nutrient, neighbor_cells):
+    def post_entity_progress(self, cell, neighbor_cells):
+        pos = cell.pos
+        entity = cell.entity
+        nutrient = cell.nutrient
+
         if entity.health < 100:
             needed_nutrients = entity.size
 
@@ -123,41 +129,42 @@ class EntityEngine(threading.Thread):
             # end if
         # end if
 
-        neighbors = list(Cell.extract_entities(neighbor_cells))
+        neighbors = list(Cell.extract_entity_cells(neighbor_cells))
         if len(neighbors) < 4 and entity.age >= entity.mature_age:
             new_pos = self.get_vacant_position(pos, entity.preferred_direction)
             if new_pos:
-                best_mate = self.find_mate(entity, neighbors)
-                if len(neighbors) > 4:
-                    self.logger.warn('pos: %s, entity: %s, mate: %s, %d' % (repr(pos), repr(entity), repr(best_mate), len(neighbors)), True)
+                if cell.nutrient and cell.nutrient.nutrient_level > 0:
+                    best_mate = self.find_mate(entity, neighbor_cells)
+                    if len(neighbors) > 4:
+                        self.logger.warn('too many neighbors pos: %s, entity: %s, mate: %s, %d' % (repr(pos), repr(entity), repr(best_mate), len(neighbors)), True)
 
-                if best_mate:
-                    child = Entity(self.stats.cycles, (entity, best_mate))
-                    self.land[new_pos].entity = child
-                    self.stats.increment_births(child)
-                    #self.terminal.add_message('birth %s; %d; %d' % (repr(pos), child.mature_age, self.stats.births_count))
+                    if best_mate:
+                        child = Entity(self.stats.cycles, (entity, best_mate))
+                        self.land[new_pos].entity = child
+                        self.stats.increment_births(child)
 
-                    # adjust female parent health
-                    female_parent = entity if entity.sex == Entity.FEMALE else best_mate
-                    if random.random() < Entity.birthing_death_rate or female_parent.health < Entity.birthing_min_health:
-                        self.stats.increment_maternal_deaths()
-                        female_parent.health = 0.0
-                    else:
-                        # giving birth increases health; if it doesn't kill the entity
-                        female_parent.health = female_parent.health * (1 + numpy.random.normal(Entity.birthing_health_bonus, Entity.birthing_health_bonus/10))
-                        female_parent.health = max(0, min(100, female_parent.health))
+                        # adjust female parent health
+                        female_parent = entity if entity.sex == Entity.FEMALE else best_mate
+                        if random.random() < Entity.birthing_death_rate or female_parent.health < Entity.birthing_min_health:
+                            self.stats.increment_maternal_deaths()
+                            female_parent.health = 0.0
+                        else:
+                            # giving birth increases health; if it doesn't kill the entity
+                            female_parent.health = female_parent.health * (1 + numpy.random.normal(Entity.birthing_health_bonus, Entity.birthing_health_bonus/10))
+                            female_parent.health = max(0, min(100, female_parent.health))
+                        # end if
+
+                        return child
+                    elif not self.child_exists(neighbors):
+                        # find new pos
+                        self.land[new_pos].entity = entity
+                        self.land[pos].entity = None
+
+                        if new_pos.y != pos.y:
+                            self.processed_rows.add(new_pos.y)
                     # end if
-
-                    return child
-                elif not self.child_exists(neighbors):
-                    # find new pos
-                    self.land[new_pos].entity = entity
-                    self.land[pos].entity = None
-
-                    if new_pos.y != pos.y:
-                        self.processed_rows.add(new_pos.y)
-                # end if
-            # end if
+                # end if nutrient
+            # end if new_pos
         # end if
     # end def
 
@@ -219,7 +226,7 @@ class EntityEngine(threading.Thread):
                             entity.progress(neighbor_cells, self.stats.cycles)
                             if entity.health > 0.0:
                                 self.stats.add_entity_stats(entity)
-                                self.post_entity_progress(pos, entity, nutrient, neighbor_cells)
+                                self.post_entity_progress(cell, neighbor_cells)
                             else:
                                 self.stats.increment_natural_deaths(entity)
                                 self.logger.info('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))

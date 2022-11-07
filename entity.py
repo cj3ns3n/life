@@ -77,7 +77,7 @@ class Entity:
     # end def
 
     def calc_health(self, neighbor_cells=[]):
-        neighbors = Cell.extract_entities(neighbor_cells)
+        neighbors = Cell.extract_entity_cells(neighbor_cells)
         new_health = self.health
 
         try:

@@ -4,13 +4,14 @@ class Cell:
     ENTITY_KEY = 'entity'
     NUTRIENT_KEY = 'nutrient'
 
-    def __init__(self, entity = None, nutrient = None):
+    def __init__(self, pos, entity = None, nutrient = None):
+        self.pos = pos
         self.entity = entity
         self.nutrient = nutrient
     # end def
 
     @staticmethod
-    def extract_entities(cells):
+    def extract_entity_cells(cells):
         entity_cells = filter(lambda cell: cell.entity, cells)
         return map(lambda cell: cell.entity, entity_cells)
     # end def
@@ -39,4 +40,5 @@ class Cell:
 
     def __repr__(self):
         return '%s%s%s' % (repr(self.entity), linesep, repr(self.nutrient))
+    # end def
 # end class
