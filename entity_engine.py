@@ -22,7 +22,7 @@ class EntityEngine(threading.Thread):
         return rows
     # end def
 
-    def get_vacant_position(self, pos, preferred_dir):
+    def get_new_position(self, pos, preferred_dir):
         vacant_positions = self.land.get_vacant_neighbor_positions(pos)
 
         if len(vacant_positions) == 1:
@@ -130,17 +130,16 @@ class EntityEngine(threading.Thread):
 
         neighbors = list(Cell.extract_entity_cells(neighbor_cells))
         if len(neighbors) < 4 and entity.age >= entity.mature_age:
-            new_pos = self.get_vacant_position(pos, entity.preferred_direction)
+            new_pos = self.get_new_position(pos, entity.preferred_direction)
             if new_pos:
                 if cell.nutrient and cell.nutrient.nutrient_level > 0:
                     best_mate = self.find_mate(entity, neighbor_cells)
-                    if len(neighbors) > 4:
-                        self.logger.warn('too many neighbors pos: %s, entity: %s, mate: %s, %d' % (repr(pos), repr(entity), repr(best_mate), len(neighbors)), True)
 
                     if best_mate:
                         child = Entity(self.stats.cycles, (entity, best_mate))
                         self.land[new_pos].entity = child
                         self.stats.increment_births(child)
+                        self.logger.info('birth pos %s' % repr(new_pos), True)
 
                         # adjust female parent health
                         female_parent = entity if entity.sex == Entity.FEMALE else best_mate
@@ -154,14 +153,15 @@ class EntityEngine(threading.Thread):
                         # end if
 
                         return child
-                    elif not self.child_exists(neighbors):
-                        # find new pos
-                        self.land[new_pos].entity = entity
-                        self.land[pos].entity = None
+                elif not self.child_exists(neighbors):
+                    self.logger.info('new pos %s' % repr(new_pos), True)
 
-                        if new_pos.y != pos.y:
-                            self.processed_rows.add(new_pos.y)
-                    # end if
+                    # find new pos
+                    self.land[new_pos].entity = entity
+                    self.land[pos].entity = None
+
+                    if new_pos.y != pos.y:
+                        self.processed_rows.add(new_pos.y)
                 # end if nutrient
             # end if new_pos
         # end if

@@ -20,6 +20,12 @@ class Cell:
         return map(lambda cell: cell.entity, entity_cells)
     # end def
 
+    @staticmethod
+    def extract_nutrient_cells(cells):
+        nutrient_cells = filter(lambda cell: cell.nutrient_level() > 0, cells)
+        return map(lambda cell: cell.nutrient, nutrient_cells)
+    # end def
+
     def __setitem__(self, key, value):
         if key == Cell.NUTRIENT_KEY:
             self.nutrient = value
