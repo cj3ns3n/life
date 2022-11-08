@@ -107,7 +107,7 @@ if __name__ == "__main__":
     terminal = TerminalDisplay(stats)
 
     for i in range(10):
-        terminal.run(stats)
+        terminal.run()
         stats.cycles += 1
         stats.population += 10
 
