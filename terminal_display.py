@@ -35,21 +35,21 @@ class TerminalDisplay:
 
     def run(self):
         stats = self.stats_container.get_stats()
-
-        self.scr.addstr(0, 0, "Cycles: %s" % self.comma_number(stats['cycles']))
-
-        pop_text_str = 'Population %s; Males %s; Females %s' % (self.comma_number(stats['births'] - stats['maternal_deaths'] - stats['natural_deaths']), self.comma_number(stats['males']), self.comma_number(stats['females']))
-        self.scr.addstr(1, 0, pop_text_str)
-
         births = stats['births']
-        births_text_str = 'Births: %s; (birth rate: %0.1f)' % (self.comma_number(births), stats['birth_rate']*100)
-        self.scr.addstr(2, 0, births_text_str)
-
         m_deaths = stats['maternal_deaths']
         n_deaths = stats['natural_deaths']
         s_deaths = stats['starvation_deaths']
         deaths = m_deaths + n_deaths + s_deaths
         m_deathrate = 100.0 * float(m_deaths) / float(births) if births > 0 else 0.0
+
+        self.scr.addstr(0, 0, "Cycles: %s" % self.comma_number(stats['cycles']))
+
+        pop_text_str = 'Population %s; Males %s; Females %s' % ((births - deaths), self.comma_number(stats['males']), self.comma_number(stats['females']))
+        self.scr.addstr(1, 0, pop_text_str)
+
+        births_text_str = 'Births: %s; (birth rate: %0.1f)' % (self.comma_number(births), stats['birth_rate']*100)
+        self.scr.addstr(2, 0, births_text_str)
+
         births_text_str = 'Deaths: %s; (birth rate: %0.1f) Maternal Deaths: %s (rate: %0.1f%%); Starvation Deaths: %s; Natural Deaths: %s (death rate: %0.1f%%)' % \
                           (self.comma_number(deaths), stats['birth_rate']*100, self.comma_number(m_deaths), m_deathrate, self.comma_number(s_deaths), self.comma_number(n_deaths), stats['death_rate']*100)
         self.scr.addstr(3, 0, births_text_str)
