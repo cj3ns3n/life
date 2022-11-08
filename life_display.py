@@ -84,7 +84,8 @@ class LifeDisplay:
         try:
             if self.show_phenotype or self.show_age or self.show_health or self.show_sex:
                 r, g, b = self.entity_color(entity)
-                if nutrient and self.show_land:
+                entity_shown = r > 0 or g > 0 or b > 0
+                if not entity_shown and nutrient and self.show_land:
                     n = nutrient.nutrient_level / 100.0
                     if r == 0 and g == 0 and b == 0:
                         r = g = b = int(255 * n)
