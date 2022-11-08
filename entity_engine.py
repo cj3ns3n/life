@@ -139,7 +139,6 @@ class EntityEngine(threading.Thread):
                         child = Entity(self.stats.cycles, (entity, best_mate))
                         self.land[new_pos].entity = child
                         self.stats.increment_births(child)
-                        self.logger.info('birth pos %s' % repr(new_pos), True)
 
                         # adjust female parent health
                         female_parent = entity if entity.sex == Entity.FEMALE else best_mate
@@ -154,8 +153,6 @@ class EntityEngine(threading.Thread):
 
                         return child
                 elif not self.child_exists(neighbors):
-                    self.logger.info('new pos %s' % repr(new_pos), True)
-
                     # find new pos
                     self.land[new_pos].entity = entity
                     self.land[pos].entity = None
