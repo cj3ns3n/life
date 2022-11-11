@@ -98,10 +98,10 @@ class EntityEngine(threading.Thread):
         return len(list(filter(lambda entity: entity.age < entity.mature_age, neighbors))) > 0
     # end def
 
-    def post_entity_progress(self, cell, neighbor_cells):
-        pos = cell.pos
+    def manage_health(self, cell):
         entity = cell.entity
         nutrient = cell.nutrient
+        pos = cell.pos
 
         if entity.health < 100:
             needed_nutrients = entity.size
@@ -127,6 +127,13 @@ class EntityEngine(threading.Thread):
                     self.logger.info('starvation: %s; %d' % (repr(pos), self.stats.starvation_deaths))
             # end if
         # end if
+    # end def
+
+    def post_entity_progress(self, cell, neighbor_cells):
+        pos = cell.pos
+        entity = cell.entity
+
+        self.manage_health(cell)
 
         neighbors = list(Cell.extract_entity_cells(neighbor_cells))
         if len(neighbors) < 4 and entity.age >= entity.mature_age:
