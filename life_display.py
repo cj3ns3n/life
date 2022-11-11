@@ -194,7 +194,7 @@ class LifeDisplay:
                         self.show_sparkles = not self.show_sparkles
                     elif event.key == pygame.K_h:
                         self.show_health = not self.show_health
-                    elif event.key == pygame.K_l:
+                    elif event.key == pygame.K_n:
                         self.show_land = not self.show_land
                     elif event.key == pygame.K_o:
                         self.show_stats_overlay = not self.show_stats_overlay
