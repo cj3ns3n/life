@@ -47,10 +47,10 @@ class TerminalDisplay:
         pop_text_str = 'Population %s; Males %s; Females %s                  ' % ((births - deaths), self.comma_number(stats['males']), self.comma_number(stats['females']))
         self.scr.addstr(1, 0, pop_text_str)
 
-        births_text_str = 'Births: %s; (birth rate: %0.1f)' % (self.comma_number(births), stats['birth_rate']*100)
+        births_text_str = 'Births: %s; (birth rate: %0.1f)    ' % (self.comma_number(births), stats['birth_rate']*100)
         self.scr.addstr(2, 0, births_text_str)
 
-        deaths_text_str = 'Deaths: %s; (death rate: %0.1f) Maternal Deaths: %s (rate: %0.1f%%); Starvation Deaths: %s; Natural Deaths: %s' % \
+        deaths_text_str = 'Deaths: %s; (death rate: %0.1f) Maternal Deaths: %s (rate: %0.1f%%); Starvation Deaths: %s; Natural Deaths: %s          ' % \
                           (self.comma_number(deaths), stats['death_rate']*100, self.comma_number(m_deaths), m_deathrate, self.comma_number(s_deaths), self.comma_number(n_deaths))
         self.scr.addstr(3, 0, deaths_text_str)
 
