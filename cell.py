@@ -21,6 +21,11 @@ class Cell:
     # end def
 
     @staticmethod
+    def extract_children(cells):
+        return filter(lambda cell: cell.entity and cell.entity.age < cell.entity.mature_age, cells)
+    # end def
+
+    @staticmethod
     def extract_nutrient_cells(cells):
         nutrient_cells = filter(lambda cell: cell.nutrient_level() > 0, cells)
         return map(lambda cell: cell.nutrient, nutrient_cells)

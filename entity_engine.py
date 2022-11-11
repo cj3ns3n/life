@@ -94,10 +94,6 @@ class EntityEngine(threading.Thread):
         return best_mate
     # end def
 
-    def child_exists(self, neighbors):
-        return len(list(filter(lambda entity: entity.age < entity.mature_age, neighbors))) > 0
-    # end def
-
     def manage_health(self, cell):
         entity = cell.entity
         nutrient = cell.nutrient
@@ -159,7 +155,7 @@ class EntityEngine(threading.Thread):
                         # end if
 
                         return child
-                elif not self.child_exists(neighbors):
+                elif len(list(Cell.extract_children(neighbor_cells))) == 0:
                     # find new pos
                     self.land[new_pos].entity = entity
                     self.land[pos].entity = None
