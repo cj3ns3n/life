@@ -125,9 +125,34 @@ class EntityEngine(threading.Thread):
         # end if
     # end def
 
+    def attempt_breeding(self, entity, neighbor_cells, open_pos):
+        best_mate = self.find_mate(entity, neighbor_cells)
+        child = None
+
+        if best_mate:
+            child = Entity(self.stats.cycles, (entity, best_mate))
+            self.land[open_pos].entity = child
+            self.stats.increment_births(child)
+
+            # adjust female parent health
+            female_parent = entity if entity.sex == Entity.FEMALE else best_mate
+            if random.random() < Entity.birthing_death_rate or female_parent.health < Entity.birthing_min_health:
+                self.stats.increment_maternal_deaths()
+                female_parent.health = 0.0
+            else:
+                # giving birth increases health; if it doesn't kill the entity
+                female_parent.health = female_parent.health * (1 + numpy.random.normal(Entity.birthing_health_bonus, Entity.birthing_health_bonus/10))
+                female_parent.health = max(0, min(100, female_parent.health))
+            # end if
+        # end if
+
+        return child
+    # end def
+
     def post_entity_progress(self, cell, neighbor_cells):
         pos = cell.pos
         entity = cell.entity
+        child = None
 
         self.manage_health(cell)
 
@@ -136,25 +161,7 @@ class EntityEngine(threading.Thread):
             new_pos = self.get_new_position(pos, entity.preferred_direction)
             if new_pos:
                 if cell.nutrient and cell.nutrient.nutrient_level > 0:
-                    best_mate = self.find_mate(entity, neighbor_cells)
-
-                    if best_mate:
-                        child = Entity(self.stats.cycles, (entity, best_mate))
-                        self.land[new_pos].entity = child
-                        self.stats.increment_births(child)
-
-                        # adjust female parent health
-                        female_parent = entity if entity.sex == Entity.FEMALE else best_mate
-                        if random.random() < Entity.birthing_death_rate or female_parent.health < Entity.birthing_min_health:
-                            self.stats.increment_maternal_deaths()
-                            female_parent.health = 0.0
-                        else:
-                            # giving birth increases health; if it doesn't kill the entity
-                            female_parent.health = female_parent.health * (1 + numpy.random.normal(Entity.birthing_health_bonus, Entity.birthing_health_bonus/10))
-                            female_parent.health = max(0, min(100, female_parent.health))
-                        # end if
-
-                        return child
+                    child = self.attempt_breeding(entity, neighbor_cells, new_pos)
                 elif len(list(Cell.extract_children(neighbor_cells))) == 0:
                     # find new pos
                     self.land[new_pos].entity = entity
@@ -165,6 +172,8 @@ class EntityEngine(threading.Thread):
                 # end if nutrient
             # end if new_pos
         # end if
+
+        return child
     # end def
 
     def get_random_neighbor(self, pos):
