@@ -2,6 +2,8 @@ The game of life is a classic computer simulation application. It has fasinated 
 
 Note: there are probably better options than PyGame for this, but it was just an experiment.\
 
+![simulation screenshot](https://raw.githubusercontent.com/cj3ns3n/life/main/life-0001830.jpg)
+
 ## Overview
 
 ### Entities and Cells
@@ -14,4 +16,3 @@ The entity_engine is a simple loop that goes through all entities and updates th
 The simulation uses PyGame to display a grid where every pixel displays an entity where the color is an indicator of the state of the entity (age, health, etc).  Various stats are overlayed on the display.  Various keys can be used to show or hide the stats and control the color mapping of the entities.
 
 The simulation also produces output to the shell using curses.  Various stats and state and control information is displayed and updates with each iteration of the simulation.
-
