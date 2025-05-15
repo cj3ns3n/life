@@ -1,8 +1,6 @@
 import numpy as np
 import random
 import math
-import numpy.random
-
 from phenotypes.cell import Cell
 
 
