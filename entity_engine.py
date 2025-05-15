@@ -2,9 +2,9 @@ import threading
 import random
 import numpy
 from pos import Pos
-from entity import Entity
-from nutrient import Nutrient
-from cell import Cell
+from phenotypes.entity import Entity
+from phenotypes.nutrient import Nutrient
+from phenotypes.cell import Cell
 
 class EntityEngine(threading.Thread):
     def __init__(self, land, stats_container, logger):

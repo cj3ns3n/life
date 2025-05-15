@@ -3,7 +3,8 @@ import random
 import math
 import numpy.random
 
-from cell import Cell
+from phenotypes.cell import Cell
+
 
 class Entity:
     FEMALE = 'f'

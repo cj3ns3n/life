@@ -1,8 +1,8 @@
 import random
 
-from cell import Cell
-from entity import Entity
-from nutrient import Nutrient
+from phenotypes.cell import Cell
+from phenotypes.entity import Entity
+from phenotypes.nutrient import Nutrient
 from pos import Pos
 
 class Land:

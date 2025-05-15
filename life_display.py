@@ -1,9 +1,10 @@
 import pygame
+
 from pos import Pos
-from entity import Entity
+from phenotypes.entity import Entity
 from entity_engine import EntityEngine
 from info_text import InfoText
-from terra_firma import Land
+from phenotypes.terra_firma import Land
 
 
 class LifeDisplay:

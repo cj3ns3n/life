@@ -1,6 +1,6 @@
 import statistics
 
-from entity import Entity
+from phenotypes.entity import Entity
 
 
 class StatsContainer:
