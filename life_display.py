@@ -2,15 +2,13 @@ import pygame
 
 from pos import Pos
 from phenotypes.entity import Entity
-from entity_engine import EntityEngine
 from info_text import InfoText
-from phenotypes.terra_firma import Land
 
 
 class LifeDisplay:
-    image_save_frequency = 10 # 10 cycles
+    image_save_frequency = 10  # 10 cycles
 
-    def __init__(self, stats, logger, display_size = (600, 300)):
+    def __init__(self, land, engine, display_size, stats, logger):
         pygame.init()
 
         self.stats = stats
@@ -20,10 +18,8 @@ class LifeDisplay:
         self.display_size = display_size
         self.surface = pygame.display.set_mode(display_size)
 
-        self.land = Land(display_size, self.logger.get_logger(Land.__name__))
-
-        self.engine = EntityEngine(self.land, self.stats, self.logger.get_logger(EntityEngine.__name__))
-        self.engine.daemon = True
+        self.land = land
+        self.engine = engine
         self.engine.start()
 
         self.max_age = 120
