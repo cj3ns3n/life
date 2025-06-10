@@ -7,6 +7,7 @@ from stats_container import StatsContainer
 from terminal_display import TerminalDisplay
 from logger import Logger
 from phenotypes.terra_firma import Land
+from phenotypes.simulation import Simulation
 from entity_engine import EntityEngine
 
 
@@ -23,7 +24,8 @@ if __name__ == '__main__':
 
     display_size =  (600, 300)
     land = Land(display_size, logger.get_logger(Land.__name__))
-    engine = EntityEngine(land, stats, logger.get_logger(EntityEngine.__name__))
+    simulation = Simulation(land, stats, logger.get_logger(Simulation.__name__))
+    engine = EntityEngine(simulation, stats, logger.get_logger(EntityEngine.__name__))
     engine.daemon = True
 
     life_display = LifeDisplay(land, engine, display_size, stats, logger)
