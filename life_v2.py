@@ -27,7 +27,9 @@ if __name__ == '__main__':
     simulation = Simulation(land, stats, logger.get_logger(Simulation.__name__))
     engine = EntityEngine(simulation, stats, logger.get_logger(EntityEngine.__name__))
     engine.daemon = True
+    engine = engine
+    engine.start()
 
-    life_display = LifeDisplay(land, engine, display_size, stats, logger)
+    life_display = LifeDisplay(land, simulation, display_size, stats, logger)
     life_display.display()
 #end if

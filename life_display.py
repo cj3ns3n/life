@@ -8,7 +8,7 @@ from info_text import InfoText
 class LifeDisplay:
     image_save_frequency = 10  # 10 cycles
 
-    def __init__(self, land, engine, display_size, stats, logger):
+    def __init__(self, land, simulation, display_size, stats, logger):
         pygame.init()
 
         self.stats = stats
@@ -19,8 +19,7 @@ class LifeDisplay:
         self.surface = pygame.display.set_mode(display_size)
 
         self.land = land
-        self.engine = engine
-        self.engine.start()
+        self.simulation = simulation
 
         self.max_age = 120
         self.min_size = 1
@@ -151,7 +150,7 @@ class LifeDisplay:
                 first = False
             else:
                 # refresh updated entities
-                updated_rows = self.engine.get_processed_rows()
+                updated_rows = self.simulation.get_processed_rows()
                 for updated_row in updated_rows:
                     self.render_row(updated_row)
 
