@@ -1,6 +1,6 @@
 import random
 
-from phenotypes.cell import Cell
+from cell import Cell
 from phenotypes.entity import Entity
 from phenotypes.nutrient import Nutrient
 from pos import Pos

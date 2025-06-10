@@ -4,7 +4,7 @@ import numpy
 from pos import Pos
 from phenotypes.entity import Entity
 from phenotypes.nutrient import Nutrient
-from phenotypes.cell import Cell
+from cell import Cell
 
 class EntityEngine(threading.Thread):
     def __init__(self, land, stats_container, logger):

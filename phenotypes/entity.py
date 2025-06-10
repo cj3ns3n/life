@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import math
-from phenotypes.cell import Cell
+from cell import Cell
 
 
 class Entity:
