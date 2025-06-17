@@ -42,7 +42,7 @@ class TerminalDisplay:
         deaths = m_deaths + n_deaths + s_deaths
         m_deathrate = 100.0 * float(m_deaths) / float(births) if births > 0 else 0.0
 
-        self.scr.addstr(0, 0, "Cycles: %s" % self.comma_number(stats['cycles']))
+        self.scr.addstr(0, 0, "Cycles: %s; qsize %d" % (self.comma_number(stats['cycles']), stats['qsize']))
 
         pop_text_str = 'Population %s; Males %s; Females %s                  ' % ((births - deaths), self.comma_number(stats['males']), self.comma_number(stats['females']))
         self.scr.addstr(1, 0, pop_text_str)

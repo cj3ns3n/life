@@ -8,7 +8,7 @@ from info_text import InfoText
 class LifeDisplay:
     image_save_frequency = 10  # 10 cycles
 
-    def __init__(self, land, simulation, display_size, stats, logger):
+    def __init__(self, land, change_queue, display_size, stats, logger):
         pygame.init()
 
         self.stats = stats
@@ -19,7 +19,7 @@ class LifeDisplay:
         self.surface = pygame.display.set_mode(display_size)
 
         self.land = land
-        self.simulation = simulation
+        self.change_queue = change_queue
 
         self.max_age = 120
         self.min_size = 1
@@ -98,6 +98,19 @@ class LifeDisplay:
         return (r, g, b)
     # end def
 
+    def render_cell(self, cell):
+        try:
+            cell_rect = pygame.Rect(cell.pos.x, cell.pos.y, 1, 1)
+            pygame.draw.rect(self.surface, self.cell_color(cell), cell_rect)
+        except ValueError:
+            self.logger.error('draw.rect ValueError %s' % repr(pos), True)
+        # end try
+
+        if self.show_sparkles and cell.entity and cell.entity.age == 0:
+            # show burst for newborns
+            self.render_burst(cell.pos)
+    # end def
+
     def render_row(self, row_idx):
         for x in range(0, self.display_size[0]):
             pos = Pos(x, row_idx)
@@ -150,15 +163,9 @@ class LifeDisplay:
                 first = False
             else:
                 # refresh updated entities
-                updated_rows = self.simulation.get_processed_rows()
-                for updated_row in updated_rows:
-                    self.render_row(updated_row)
-
-                    width = self.display_size[0]
-                    height = 1
-                    update_rect = pygame.Rect(0, updated_row, width, height)
-                    pygame.display.update(update_rect)
-                # end if
+                changed_cell = self.change_queue.get()
+                if changed_cell:
+                    self.render_cell(changed_cell)
 
                 if self.show_stats_overlay:
                     self.infoText.blit(self.surface, self.stats)

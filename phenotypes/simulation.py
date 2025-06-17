@@ -6,9 +6,9 @@ from phenotypes.nutrient import Nutrient
 from cell import Cell
 
 class Simulation:
-    def __init__(self, land, stats_container, logger):
+    def __init__(self, land, change_queue, stats_container, logger):
         self.land = land
-        self.processed_rows = set()
+        self.change_queue = change_queue
         self.stats = stats_container
         self.logger = logger
     # end def
@@ -49,16 +49,11 @@ class Simulation:
                 if nutrient and nutrient.nutrient_level > 0:
                     self.post_nutrient_progress(nutrient, pos)
                     self.stats.add_nutrient_stats(nutrient)
+
+                self.change_queue.add(cell)
+                self.logger.debug('cell added %s' % repr(cell.pos))
             # end for x
-
-            self.processed_rows.add(y)
         # end for y
-    # end def
-
-    def get_processed_rows(self):
-        rows = self.processed_rows.copy()
-        self.processed_rows = set()
-        return rows
     # end def
 
     def get_new_position(self, pos, preferred_dir):
@@ -207,7 +202,7 @@ class Simulation:
                     self.land[pos].entity = None
 
                     if new_pos.y != pos.y:
-                        self.processed_rows.add(new_pos.y)
+                        self.change_queue.add(cell)
                 # end if nutrient
             # end if new_pos
         # end if
