@@ -1,4 +1,4 @@
-import random
+import stochastic
 import logging
 import uuid
 
@@ -12,7 +12,7 @@ class Entity:
   def __init__(self):
     self.age = 0
     self.name = str(uuid.uuid4()).split('-')[1]
-    self.sex = random.choice([Entity.MALE, Entity.FEMALE])
+    self.sex = stochastic.choice([Entity.MALE, Entity.FEMALE])
     self.health = 100
     self.strength = 1
     self.size = 1

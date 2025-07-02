@@ -1,18 +1,18 @@
+import argparse
+from importlib import import_module
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-import argparse
 from life_display import LifeDisplay
 from stats_container import StatsContainer
 from terminal_display import TerminalDisplay
 from logger import Logger
-from phenotypes.terra_firma import Land
-from phenotypes.simulation import Simulation
 from entity_engine import EntityEngine
 from change_queue import ChangeQueue
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'Life Simulation')
+    parser.add_argument('-s', '--simulation-name', default='phenotypes', help='simulation model')
     parser.add_argument('-l', '--log-file', help='log file')
 
     args = parser.parse_args()
@@ -25,8 +25,12 @@ if __name__ == '__main__':
     terminal.run()
     logger = Logger(terminal, LifeDisplay.__name__, args.log_file)
 
-    land = Land(display_size, logger.get_logger(Land.__name__))
-    simulation = Simulation(land, change_queue, stats, logger.get_logger(Simulation.__name__))
+    sim_name = args.simulation_name
+    land_module = import_module(sim_name + '.land')
+    sim_module = import_module(sim_name + '.simulation')
+    land = eval('land_module.Land(display_size, logger.get_logger(land_module.Land.__name__))')
+    simulation = eval('sim_module.Simulation(land, change_queue, stats, logger.get_logger(sim_module.Simulation.__name__))')
+
     engine = EntityEngine(simulation, stats, logger.get_logger(EntityEngine.__name__))
     engine.daemon = True
     engine = engine
