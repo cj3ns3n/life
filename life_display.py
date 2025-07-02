@@ -33,6 +33,8 @@ class LifeDisplay:
         self.show_sex = True
         self.show_stats_overlay = False
         self.show_land = True
+
+        self.changed_cells = []
     # end def
 
     def entity_color(self, entity):
@@ -96,6 +98,27 @@ class LifeDisplay:
             self.logger.error('cell color error: %s - %s' % (entity, nutrient))
 
         return (r, g, b)
+    # end def
+
+    def render_cells(self, cells):
+        minx = self.display_size[0]
+        miny = self.display_size[1]
+        maxx = 0
+        maxy = 0
+
+        for cell in cells:
+            minx = min(minx, cell.pos.x)
+            miny = min(miny, cell.pos.y)
+            maxx = max(maxx, cell.pos.x)
+            maxy = max(maxy, cell.pos.y)
+
+            try:
+                cell_rect = pygame.Rect(cell.pos.x, cell.pos.y, 1, 1)
+                pygame.draw.rect(self.surface, self.cell_color(cell), cell_rect)
+            except ValueError:
+                self.logger.error('draw.rect ValueError %s' % repr(cell.pos), True)
+            # end try
+        # end for
     # end def
 
     def render_cell(self, cell):
@@ -164,8 +187,11 @@ class LifeDisplay:
             else:
                 # refresh updated entities
                 changed_cell = self.change_queue.get()
-                if changed_cell:
-                    self.render_cell(changed_cell)
+                self.changed_cells.append(changed_cell)
+                if len(self.changed_cells) > 100:
+                    #self.render_cell(changed_cell)
+                    self.render_cells(self.changed_cells)
+                    self.changed_cells = []
 
                 if self.show_stats_overlay:
                     self.infoText.blit(self.surface, self.stats)

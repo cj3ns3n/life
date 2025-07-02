@@ -44,14 +44,15 @@ class Simulation:
                             self.logger.info('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))
                         # end if
                     # end if
+
+                    self.change_queue.add(cell)
                 # end if
 
                 if nutrient and nutrient.nutrient_level > 0:
                     self.post_nutrient_progress(nutrient, pos)
                     self.stats.add_nutrient_stats(nutrient)
-
-                self.change_queue.add(cell)
-                self.logger.debug('cell added %s' % repr(cell.pos))
+                    self.change_queue.add(cell)
+                # end if
             # end for x
         # end for y
     # end def
