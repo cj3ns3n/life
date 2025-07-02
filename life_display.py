@@ -21,16 +21,11 @@ class LifeDisplay:
         self.land = land
         self.change_queue = change_queue
 
-        self.max_age = 120
-        self.min_size = 1
-        self.max_health = 100
-        self.min_health = 75
-
-        self.show_phenotype = True
-        self.show_age = True
+        self.show_entity = True
+        self.show_aspect_1 = False
+        self.show_aspect_2 = False
+        self.show_aspect_3 = False
         self.show_sparkles = True
-        self.show_health = True
-        self.show_sex = True
         self.show_stats_overlay = False
         self.show_land = True
 
@@ -41,22 +36,22 @@ class LifeDisplay:
         r = g = b = 0
 
         if entity is not None and entity.health > 0:
-            if self.show_phenotype:
+            if self.show_entity:
                 r = entity.phenotype[0]
                 g = entity.phenotype[1]
                 b = entity.phenotype[2]
             else:
-                if self.show_age:
+                if self.show_aspect_1:
                     if entity.age > self.max_age:
                         self.max_age = entity.age
                     r = int(255.0 * 1.0 - (entity.age / self.max_age))
 
-                if self.show_health:
+                if self.show_aspect_2:
                     if entity.health < self.min_health:
                         self.min_health = entity.health
                     g = int(255.0 * (entity.health - self.min_health) / (self.max_health - self.min_health))
 
-                if self.show_sex:
+                if self.show_aspect_3:
                     if entity.sex == Entity.MALE:
                         b = 255
                     else:
@@ -79,23 +74,14 @@ class LifeDisplay:
         nutrient = cell.nutrient
         entity = cell.entity
 
-        try:
-            if self.show_phenotype or self.show_age or self.show_health or self.show_sex:
-                r, g, b = self.entity_color(entity)
-                entity_shown = r > 0 or g > 0 or b > 0
-                if not entity_shown and nutrient and self.show_land:
-                    n = nutrient.nutrient_level / 100.0
-                    if r == 0 and g == 0 and b == 0:
-                        r = g = b = int(255 * n)
-                    else:
-                        r = int(r * n)
-                        g = int(g * n)
-                        b = int(b * n)
-            elif nutrient and self.show_land:
-                r = g = b = int(255 * nutrient.nutrient_level / 100.0)
-            # end if
-        except Exception as ex:
-            self.logger.error('cell color error: %s - %s' % (entity, nutrient))
+        if entity:
+            try:
+                if self.show_entity or self.show_aspect_1 or self.show_aspect_2 or self.show_aspect_3:
+                    r, g, b = entity.calc_color(self.show_aspect_1, self.show_aspect_2, self.show_aspect_3)
+            except Exception as ex:
+                self.logger.error('cell color error: %s - %s' % (entity, nutrient))
+                self.logger.error(str(ex))
+        # end if
 
         return (r, g, b)
     # end def
@@ -217,20 +203,20 @@ class LifeDisplay:
                     if event.key == pygame.K_ESCAPE:
                         game_running = False
                         break
-                    elif event.key == pygame.K_a:
-                        self.show_age = not self.show_age
+                    elif event.key == pygame.K_e:
+                        self.show_entity = not self.show_entity
+                    elif event.key == pygame.K_1:
+                        self.show_aspect_1 = not self.show_aspect_1
+                    elif event.key == pygame.K_2:
+                        self.show_aspect_2 = not self.show_aspect_2
+                    elif event.key == pygame.K_3:
+                        self.show_aspect_3 = not self.show_aspect_3
                     elif event.key == pygame.K_b:
                         self.show_sparkles = not self.show_sparkles
-                    elif event.key == pygame.K_h:
-                        self.show_health = not self.show_health
                     elif event.key == pygame.K_n:
                         self.show_land = not self.show_land
                     elif event.key == pygame.K_o:
                         self.show_stats_overlay = not self.show_stats_overlay
-                    elif event.key == pygame.K_p:
-                        self.show_phenotype = not self.show_phenotype
-                    elif event.key == pygame.K_s:
-                        self.show_sex = not self.show_sex
                 # end if
             # end for
 

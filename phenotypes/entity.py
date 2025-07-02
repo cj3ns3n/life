@@ -24,6 +24,12 @@ class Entity:
     birthing_min_health = 20
     birthing_health_bonus = 0.1
 
+    max_age = 150
+    min_size = 1
+    max_health = 100
+    min_health = 75
+
+
     def __init__(self, cycle, parents=None):
         self.age = 0
         self.cycle = cycle
@@ -91,6 +97,43 @@ class Entity:
             return 0.0
 
         return min(100, max(0, new_health))
+    # end def
+
+    def calc_color(self, show_age=False, show_health=False, show_sex=False):
+        r = g = b = 0
+
+        if not show_age and not show_health and not show_sex:
+            r = self.phenotype[0]
+            g = self.phenotype[1]
+            b = self.phenotype[2]
+        else:
+            if show_age:
+                if self.age > Entity.max_age:
+                    r = 255
+                else:
+                    r = int(255.0 * 1.0 - (self.age / Entity.max_age))
+
+            if show_health:
+                if self.health < Entity.min_health:
+                    g = 0
+                else:
+                    g = int(255.0 * (self.health - self.min_health) / (self.max_health - self.min_health))
+
+            if show_sex:
+                if self.sex == Entity.MALE:
+                    b = 255
+                else:
+                    r = 255
+
+                if self.age < self.mature_age:
+                    g = 255
+            # end if
+
+            if r < 0 or r > 255 or g < 0 or g > 255 or b < 0 or b > 255:
+                self.logger.error('bad color: %s: %s' % (str((r, g, b)), str(self)), True)
+        # end if
+
+        return (r, g, b)
     # end def
 
     def progress(self, neighbor_cells, cycle):

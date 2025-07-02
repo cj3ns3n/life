@@ -74,13 +74,13 @@ class TerminalDisplay:
         commands_line = 16
         self.scr.addstr(commands_line, 0, 'Key Commands:')
         self.scr.addstr(commands_line + 1, 0, '\tESC\t- Close program')
-        self.scr.addstr(commands_line + 2, 0, '\ta\t- Toggle display of age as a color')
-        self.scr.addstr(commands_line + 3, 0, '\tb\t- Toggle display of birth sparkle')
-        self.scr.addstr(commands_line + 4, 0, '\th\t- Toggle display of health as a color')
-        self.scr.addstr(commands_line + 5, 0, '\tn\t- Toggle display of land nutrients')
-        self.scr.addstr(commands_line + 6, 0, '\to\t- Toggle display of stats overlay')
-        self.scr.addstr(commands_line + 7, 0, '\tp\t- Toggle display of phenotype color; overrides other entity colors')
-        self.scr.addstr(commands_line + 8, 0, '\ts\t- Toggle display of sex as a color')
+        self.scr.addstr(commands_line + 2, 0, '\t1\t- Toggle display of aspect 1 as a color')
+        self.scr.addstr(commands_line + 3, 0, '\t2\t- Toggle display of aspect 2 as a color')
+        self.scr.addstr(commands_line + 4, 0, '\t3\t- Toggle display of aspect 3 as a color')
+        self.scr.addstr(commands_line + 5, 0, '\te\t- Toggle display of entity color; overrides other entity colors')
+        self.scr.addstr(commands_line + 6, 0, '\tb\t- Toggle display of birth sparkle')
+        self.scr.addstr(commands_line + 7, 0, '\tn\t- Toggle display of land nutrients')
+        self.scr.addstr(commands_line + 8, 0, '\to\t- Toggle display of stats overlay')
 
         self.scr.refresh()
     # end def
