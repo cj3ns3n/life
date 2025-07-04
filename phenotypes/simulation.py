@@ -1,5 +1,7 @@
 import random
 import numpy
+
+import constants
 from pos import Pos
 from phenotypes.entity import Entity
 from phenotypes.nutrient import Nutrient
@@ -63,19 +65,19 @@ class Simulation:
         if len(vacant_positions) == 1:
             return vacant_positions[0]
         elif len(vacant_positions) > 0:
-            if preferred_dir == Entity.NORTH:
+            if preferred_dir == constants.NORTH:
                 north_loc = Pos(pos.x, pos.y - 1)
                 if north_loc in vacant_positions:
                     return north_loc
-            elif preferred_dir == Entity.SOUTH:
+            elif preferred_dir == constants.SOUTH:
                 south_loc = Pos(pos.x, pos.y + 1)
                 if south_loc in vacant_positions:
                     return south_loc
-            elif preferred_dir == Entity.WEST:
+            elif preferred_dir == constants.WEST:
                 west_loc = Pos(pos.x - 1, pos.y)
                 if west_loc in vacant_positions:
                     return west_loc
-            elif preferred_dir == Entity.EAST:
+            elif preferred_dir == constants.EAST:
                 east_loc = Pos(pos.x + 1, pos.y)
                 if east_loc in vacant_positions:
                     return east_loc
@@ -170,7 +172,7 @@ class Simulation:
             self.stats.increment_births(child)
 
             # adjust female parent health
-            female_parent = entity if entity.sex == Entity.FEMALE else best_mate
+            female_parent = entity if entity.sex == constants.FEMALE else best_mate
             if random.random() < Entity.birthing_death_rate or female_parent.health < Entity.birthing_min_health:
                 self.stats.increment_maternal_deaths()
                 female_parent.health = 0.0

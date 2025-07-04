@@ -175,7 +175,6 @@ class LifeDisplay:
                 changed_cell = self.change_queue.get()
                 self.changed_cells.append(changed_cell)
                 if len(self.changed_cells) > 100:
-                    #self.render_cell(changed_cell)
                     self.render_cells(self.changed_cells)
                     self.changed_cells = []
 

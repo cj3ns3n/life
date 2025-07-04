@@ -1,7 +1,6 @@
 import statistics
 
-from phenotypes.entity import Entity
-
+import constants
 
 class StatsContainer:
     def __init__(self, change_queue):
@@ -124,7 +123,7 @@ class StatsContainer:
     def increment_births(self, baby):
         self.births_count += 1
         self.cycle_births += 1
-        if baby.sex == Entity.MALE:
+        if baby.sex == constants.MALE:
             self.males_count += 1
         else:
             self.female_count += 1
@@ -133,7 +132,7 @@ class StatsContainer:
     def increment_natural_deaths(self, entity):
         self.natural_deaths += 1
         self.cycle_deaths += 1
-        if entity.sex == Entity.MALE:
+        if entity.sex == constants.MALE:
             self.males_count -= 1
         else:
             self.female_count -= 1
@@ -142,7 +141,7 @@ class StatsContainer:
     def increment_starvations(self, entity):
         self.starvation_deaths += 1
         self.cycle_deaths += 1
-        if entity.sex == Entity.MALE:
+        if entity.sex == constants.MALE:
             self.males_count -= 1
         else:
             self.female_count -= 1

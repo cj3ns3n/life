@@ -1,18 +1,12 @@
 import numpy as np
 import random
 import math
+
+import constants
 from cell import Cell
 
 
 class Entity:
-    FEMALE = 'f'
-    MALE   = 'm'
-
-    NORTH  = 'n'
-    SOUTH  = 's'
-    EAST   = 'e'
-    WEST   = 'w'
-
     health_range = 5
     size_range = 1
     phenotype_range = 1
@@ -33,8 +27,8 @@ class Entity:
     def __init__(self, cycle, parents=None):
         self.age = 0
         self.cycle = cycle
-        self.sex = random.choice([Entity.MALE, Entity.FEMALE])
-        self.preferred_direction = random.choice([Entity.NORTH, Entity.SOUTH, Entity.EAST, Entity.WEST])
+        self.sex = random.choice([constants.MALE, constants.FEMALE])
+        self.preferred_direction = random.choice([constants.NORTH, constants.SOUTH, constants.EAST, constants.WEST])
 
         self.health = self.get_initial_health(parents)
 
@@ -120,7 +114,7 @@ class Entity:
                     g = int(255.0 * (self.health - self.min_health) / (self.max_health - self.min_health))
 
             if show_sex:
-                if self.sex == Entity.MALE:
+                if self.sex == constants.MALE:
                     b = 255
                 else:
                     r = 255
