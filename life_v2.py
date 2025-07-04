@@ -8,7 +8,7 @@ from stats_container import StatsContainer
 from terminal_display import TerminalDisplay
 from logger import Logger
 from entity_engine import EntityEngine
-from change_queue import ChangeQueue
+from safe_set import SafeSet
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'Life Simulation')
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     display_size = (600, 300)
-    change_queue = ChangeQueue(display_size[0] * display_size[1])
+    change_queue = SafeSet()
 
     stats = StatsContainer(change_queue)
     terminal = TerminalDisplay(stats)

@@ -14,6 +14,14 @@ class Cell:
         return 0 if self.nutrient is None else self.nutrient.nutrient_level
     # end def
 
+    def __eq__(self, other):
+        return repr(self.pos) == repr(other.pos)
+    # end def
+
+    def __hash__(self):
+        return hash(repr(self.pos))
+    # end def
+
     @staticmethod
     def extract_entity_cells(cells):
         entity_cells = filter(lambda cell: cell.entity, cells)
