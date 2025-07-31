@@ -199,13 +199,15 @@ class Simulation:
             if new_pos:
                 if cell.nutrient and cell.nutrient.nutrient_level > 0:
                     child = self.attempt_breeding(entity, neighbor_cells, new_pos)
+                    if child:
+                        self.change_queue.add(self.land[new_pos])
                 elif len(list(Cell.extract_children(neighbor_cells))) == 0:
                     # find new pos
                     self.land[new_pos].entity = entity
                     self.land[pos].entity = None
 
-                    if new_pos.y != pos.y:
-                        self.change_queue.add(cell)
+                    if new_pos.y != pos.y or new_pos.x != pos.x:
+                        self.change_queue.add(self.land[new_pos])
                 # end if nutrient
             # end if new_pos
         # end if
