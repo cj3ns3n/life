@@ -14,7 +14,9 @@ class SafeSet:
 
     def get(self):
         with self.lock:
-            return self.data_set.pop()
+            if len(self.data_set) > 0:
+                return self.data_set.pop()
+            return None
     # end def
 
     def __len__(self):

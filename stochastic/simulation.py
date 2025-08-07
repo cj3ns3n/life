@@ -32,36 +32,23 @@ class Simulation:
                         self.logger.info('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))
                     # end if
 
-                    self.change_queue.add(cell)
+                    new_pos = self.get_new_position(pos)
+                    if new_pos:
+                        new_cell = self.land[new_pos]
+                        new_cell.entity = entity
+                        cell.entity = None
+                        self.change_queue.add(new_cell)
+                        self.change_queue.add(cell)
                 # end def
             # end for x
         # end for y
     # end def
 
-    def get_new_position(self, pos, preferred_dir):
+    def get_new_position(self, pos):
         vacant_positions = self.land.get_vacant_neighbor_positions(pos)
 
-        if len(vacant_positions) == 1:
-            return vacant_positions[0]
-        elif len(vacant_positions) > 0:
-            if preferred_dir == constants.NORTH:
-                north_loc = Pos(pos.x, pos.y - 1)
-                if north_loc in vacant_positions:
-                    return north_loc
-            elif preferred_dir == constants.SOUTH:
-                south_loc = Pos(pos.x, pos.y + 1)
-                if south_loc in vacant_positions:
-                    return south_loc
-            elif preferred_dir == constants.WEST:
-                west_loc = Pos(pos.x - 1, pos.y)
-                if west_loc in vacant_positions:
-                    return west_loc
-            elif preferred_dir == constants.EAST:
-                east_loc = Pos(pos.x + 1, pos.y)
-                if east_loc in vacant_positions:
-                    return east_loc
-            # end if
-
+        self.logger.info('num vacancies: %d' % len(vacant_positions))
+        if len(vacant_positions) == 4:
             return random.choice(vacant_positions)
         # end if
 

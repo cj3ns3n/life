@@ -6,10 +6,15 @@ import constants
 
 class Entity:
     def __init__(self):
-        self.health = np.random.normal(0, 1)
         self.age = 0
-        self.size = self.health
         self.sex = random.choice([constants.MALE, constants.FEMALE])
+        self.health = np.random.normal(0.5, 0.2)
+        self.size = self.health
+
+        if self.health < 0:
+            self.health = 0.1
+        if self.health > 1:
+            self.health = 1.0
     # end def
 
     def progress(self):
@@ -19,6 +24,8 @@ class Entity:
 
         if self.health < 0:
             self.health = 0.1
+        if self.health > 1:
+            self.health = 1.0
 
         self.size = self.health
     # end def
@@ -37,6 +44,10 @@ class Entity:
             if use_b:
                 b = value
         # end if
+
+        if value <= 0:
+            r = 200
+            g = b = 0
 
         return (r, g, b)
     # end def

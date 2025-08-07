@@ -102,7 +102,7 @@ class LifeDisplay:
                 cell_rect = pygame.Rect(cell.pos.x, cell.pos.y, 1, 1)
                 pygame.draw.rect(self.surface, self.cell_color(cell), cell_rect)
             except ValueError:
-                self.logger.error('draw.rect ValueError %s' % repr(cell.pos), True)
+                self.logger.error('render_cells: draw.rect ValueError %s' % repr(cell.pos), True)
             # end try
         # end for
     # end def
@@ -112,7 +112,7 @@ class LifeDisplay:
             cell_rect = pygame.Rect(cell.pos.x, cell.pos.y, 1, 1)
             pygame.draw.rect(self.surface, self.cell_color(cell), cell_rect)
         except ValueError:
-            self.logger.error('draw.rect ValueError %s' % repr(pos), True)
+            self.logger.error('render_cell: draw.rect ValueError %s' % repr(cell.pos), True)
         # end try
 
         if self.show_sparkles and cell.entity and cell.entity.age == 0:
@@ -125,10 +125,12 @@ class LifeDisplay:
             pos = Pos(x, row_idx)
             cell = self.land[pos]
             cell_rect = pygame.Rect(x, row_idx, 1, 1)
+            color = self.cell_color(cell)
             try:
-                pygame.draw.rect(self.surface, self.cell_color(cell), cell_rect)
+                pygame.draw.rect(self.surface, color, cell_rect)
             except ValueError:
-                self.logger.error('draw.rect ValueError %s' % repr(pos), True)
+                self.logger.error('render_row: draw.rect ValueError pos: %s; color: %s' % (repr(pos), repr(color)), True)
+                self.logger.error('entity %s' % repr(cell.entity))
             # end try
 
             if self.show_sparkles and cell.entity and cell.entity.age == 0:
@@ -173,14 +175,16 @@ class LifeDisplay:
             else:
                 # refresh updated entities
                 changed_cell = self.change_queue.get()
-                self.changed_cells.append(changed_cell)
-                if len(self.changed_cells) > 100:
-                    self.render_cells(self.changed_cells)
-                    self.changed_cells = []
+                if changed_cell:
+                    self.changed_cells.append(changed_cell)
+                    if len(self.changed_cells) > 100:
+                        self.render_cells(self.changed_cells)
+                        self.changed_cells = []
 
-                if self.show_stats_overlay:
-                    self.infoText.blit(self.surface, self.stats)
-                    pygame.display.update(self.infoText.get_rect())
+                    if self.show_stats_overlay:
+                        self.infoText.blit(self.surface, self.stats)
+                        pygame.display.update(self.infoText.get_rect())
+                # end if
             # end if
 
             self.logger.refresh_terminal()
