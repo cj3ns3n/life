@@ -35,7 +35,12 @@ class Entity:
         r = g = b = 0
 
         if not use_r and not use_g and not use_b:
-            r = g = b = value
+            if self.health > 0.5:
+                g = int(255.0 * (self.health - 0.5) * 2.0)
+                r = b = 0
+            else:
+                r = int(255.0 * (self.health) * 2.0)
+                g = b = 0
         else:
             if use_r:
                 r = value
@@ -46,8 +51,8 @@ class Entity:
         # end if
 
         if value <= 0:
-            r = 200
-            g = b = 0
+            b = 200
+            g = r = 10
 
         return (r, g, b)
     # end def
