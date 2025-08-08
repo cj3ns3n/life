@@ -32,43 +32,6 @@ class LifeDisplay:
         self.changed_cells = []
     # end def
 
-    def entity_color(self, entity):
-        r = g = b = 0
-
-        if entity is not None and entity.health > 0:
-            if self.show_entity:
-                r = entity.phenotype[0]
-                g = entity.phenotype[1]
-                b = entity.phenotype[2]
-            else:
-                if self.show_aspect_1:
-                    if entity.age > self.max_age:
-                        self.max_age = entity.age
-                    r = int(255.0 * 1.0 - (entity.age / self.max_age))
-
-                if self.show_aspect_2:
-                    if entity.health < self.min_health:
-                        self.min_health = entity.health
-                    g = int(255.0 * (entity.health - self.min_health) / (self.max_health - self.min_health))
-
-                if self.show_aspect_3:
-                    if entity.sex == Entity.MALE:
-                        b = 255
-                    else:
-                        r = 255
-
-                    if entity.age < entity.mature_age:
-                        g = 255
-                # end if
-            # end if
-
-            if r < 0 or r > 255 or g < 0 or g > 255 or b < 0 or b > 255:
-                self.logger.error('bad color: %s: %s' % (str((r, g, b)), str(entity)), True)
-        # end if
-
-        return (r, g, b)
-    # end def
-
     def cell_color(self, cell):
         r = g = b = 0
         nutrient = cell.nutrient
