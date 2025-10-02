@@ -47,13 +47,13 @@ class Simulation:
                         # end if
                     # end if
 
-                    self.surface[cell.pos.x, cell.pos.y, :] = self.calc_cell_color(cell)
+                    self.surface.set_color(cell.pos, self.calc_cell_color(cell))
                 # end if
 
                 if nutrient and nutrient.nutrient_level > 0:
                     self.post_nutrient_progress(nutrient, pos)
                     self.stats.add_nutrient_stats(nutrient)
-                    self.surface[cell.pos.x, cell.pos.y, :] = self.calc_cell_color(cell)
+                    self.surface.set_color(cell.pos, self.calc_cell_color(cell))
                 # end if
             # end for x
         # end for y
@@ -209,14 +209,14 @@ class Simulation:
                 if cell.nutrient and cell.nutrient.nutrient_level > 0:
                     child = self.attempt_breeding(entity, neighbor_cells, new_pos)
                     if child:
-                        self.surface[new_pos.x, new_pos.y, :] = self.calc_cell_color(self.land[new_pos])
+                        self.surface.set_color(new_pos, self.calc_cell_color(self.land[new_pos]))
                 elif len(list(Cell.extract_children(neighbor_cells))) == 0:
                     # find new pos
                     self.land[new_pos].entity = entity
                     self.land[pos].entity = None
 
                     if new_pos.y != pos.y or new_pos.x != pos.x:
-                        self.surface[new_pos.x, new_pos.y, :] = entity.calc_color()
+                        self.surface.set_color(new_pos, entity.calc_color())
                 # end if nutrient
             # end if new_pos
         # end if

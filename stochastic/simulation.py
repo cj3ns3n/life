@@ -35,7 +35,7 @@ class Simulation:
                         new_cell = self.land[new_pos]
                         new_cell.entity = entity
                         cell.entity = None
-                        self.surface[new_pos.x, new_pos.y, :] = entity.calc_color()
+                        self.surface.set_color(new_pos, entity.calc_color())
                 # end def
             # end for x
         # end for y

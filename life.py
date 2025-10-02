@@ -32,7 +32,7 @@ if __name__ == '__main__':
     land_module = import_module(sim_name + '.land')
     sim_module = import_module(sim_name + '.simulation')
     land = eval('land_module.Land(display_size, logger.get_logger(land_module.Land.__name__))')
-    simulation = eval('sim_module.Simulation(land, sim_surface.surface_array, stats, logger.get_logger(sim_module.Simulation.__name__))')
+    simulation = eval('sim_module.Simulation(land, sim_surface, stats, logger.get_logger(sim_module.Simulation.__name__))')
 
     engine = EntityEngine(simulation, sim_surface, stats, logger.get_logger(EntityEngine.__name__))
     engine.daemon = True
