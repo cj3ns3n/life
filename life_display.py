@@ -1,25 +1,23 @@
 import pygame
 
 from pos import Pos
-from phenotypes.entity import Entity
 from info_text import InfoText
 
 
 class LifeDisplay:
     image_save_frequency = 10  # 10 cycles
 
-    def __init__(self, land, change_queue, display_size, stats, logger):
+    def __init__(self, land, sim_surface, stats, logger):
         pygame.init()
+        self.sim_surface = sim_surface
+        self.display = pygame.display.set_mode(sim_surface.surface_array.shape[:2])
+        pygame.display.set_caption("It's alive")
 
         self.stats = stats
         self.infoText = InfoText()
         self.logger = logger
 
-        self.display_size = display_size
-        self.surface = pygame.display.set_mode(display_size)
-
         self.land = land
-        self.change_queue = change_queue
 
         self.show_entity = True
         self.show_aspect_1 = False
@@ -32,124 +30,17 @@ class LifeDisplay:
         self.changed_cells = []
     # end def
 
-    def cell_color(self, cell):
-        r = g = b = 0
-        nutrient = cell.nutrient
-        entity = cell.entity
-
-        if entity:
-            try:
-                if self.show_entity or self.show_aspect_1 or self.show_aspect_2 or self.show_aspect_3:
-                    r, g, b = entity.calc_color(self.show_aspect_1, self.show_aspect_2, self.show_aspect_3)
-            except Exception as ex:
-                self.logger.error('cell color error: %s - %s' % (entity, nutrient))
-                self.logger.error(str(ex))
-        # end if
-
-        return (r, g, b)
-    # end def
-
-    def render_cells(self, cells):
-        minx = self.display_size[0]
-        miny = self.display_size[1]
-        maxx = 0
-        maxy = 0
-
-        for cell in cells:
-            minx = min(minx, cell.pos.x)
-            miny = min(miny, cell.pos.y)
-            maxx = max(maxx, cell.pos.x)
-            maxy = max(maxy, cell.pos.y)
-
-            try:
-                cell_rect = pygame.Rect(cell.pos.x, cell.pos.y, 1, 1)
-                pygame.draw.rect(self.surface, self.cell_color(cell), cell_rect)
-            except ValueError:
-                self.logger.error('render_cells: draw.rect ValueError %s' % repr(cell.pos), True)
-            # end try
-        # end for
-    # end def
-
-    def render_cell(self, cell):
-        try:
-            cell_rect = pygame.Rect(cell.pos.x, cell.pos.y, 1, 1)
-            pygame.draw.rect(self.surface, self.cell_color(cell), cell_rect)
-        except ValueError:
-            self.logger.error('render_cell: draw.rect ValueError %s' % repr(cell.pos), True)
-        # end try
-
-        if self.show_sparkles and cell.entity and cell.entity.age == 0:
-            # show burst for newborns
-            self.render_burst(cell.pos)
-    # end def
-
-    def render_row(self, row_idx):
-        for x in range(0, self.display_size[0]):
-            pos = Pos(x, row_idx)
-            cell = self.land[pos]
-            cell_rect = pygame.Rect(x, row_idx, 1, 1)
-            color = self.cell_color(cell)
-            try:
-                pygame.draw.rect(self.surface, color, cell_rect)
-            except ValueError:
-                self.logger.error('render_row: draw.rect ValueError pos: %s; color: %s' % (repr(pos), repr(color)), True)
-                self.logger.error('entity %s' % repr(cell.entity))
-            # end try
-
-            if self.show_sparkles and cell.entity and cell.entity.age == 0:
-                # show burst for newborns
-                self.render_burst(pos)
-        # end for
-    # end def
-
-    def render_rows(self, y_range):
-        for y in range(y_range[0], y_range[1]):
-            self.render_row(y)
-    # end def
-
-    def render_burst(self, pos):
-        leftx = max(0, pos.x - 3)
-        lefty = max(0, pos.y - 3)
-        centerx = max(0, pos.x - 1)
-        centery = max(0, pos.y - 1)
-
-        burst_rect = pygame.Rect(leftx, pos.y, 7, 1)
-        pygame.draw.rect(self.surface, (255, 255, 255, 250), burst_rect)
-        burst_rect = pygame.Rect(pos.x, lefty, 1, 7)
-        pygame.draw.rect(self.surface, (255, 255, 255, 250), burst_rect)
-        burst_rect = pygame.Rect(centerx, centery, 3, 3)
-        pygame.draw.rect(self.surface, (255, 255, 255, 250), burst_rect)
-
-        return pygame.Rect(leftx, lefty, 7, 7)
-    # end def
-
-    def display(self):
+    def start(self):
         game_running = True
         last_mouse_pos = Pos(0, 0)
 
-        self.render_rows((0, self.display_size[1]))
-
         self.logger.info('display started')
-        first = True
         while game_running:
-            if first:
-                pygame.display.flip()
-                first = False
-            else:
-                # refresh updated entities
-                changed_cell = self.change_queue.get()
-                if changed_cell:
-                    self.changed_cells.append(changed_cell)
-                    if len(self.changed_cells) > 100:
-                        self.render_cells(self.changed_cells)
-                        self.changed_cells = []
+            surface_array = self.sim_surface.get_surface_array()
+            life_surface = pygame.surfarray.make_surface(surface_array)
 
-                    if self.show_stats_overlay:
-                        self.infoText.blit(self.surface, self.stats)
-                        pygame.display.update(self.infoText.get_rect())
-                # end if
-            # end if
-
+            self.display.blit(life_surface, (0, 0))
+            pygame.display.update()
             self.logger.refresh_terminal()
 
             # save periodic image
@@ -198,3 +89,21 @@ class LifeDisplay:
         exit()
     #end def
 #end class
+
+def nop(*args):
+    pass
+
+if __name__ == '__main__':
+    from sim_surface import SimulationSurface
+    sim_surface = SimulationSurface((600, 600))
+
+    from stats_container import StatsContainer
+    stats = StatsContainer(None)
+
+    logger = lambda: None
+    logger.shutdown = nop
+    logger.refresh_terminal = nop
+    logger.info = nop
+
+    display = LifeDisplay(None, sim_surface, stats, logger)
+    display.start()

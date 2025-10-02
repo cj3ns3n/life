@@ -53,7 +53,7 @@ class StatsContainer:
         stats['males'] = self.males_count
         stats['females'] = self.female_count
         stats['cycles'] = self.cycles
-        stats['qsize'] = len(self.change_queue)
+        #stats['qsize'] = len(self.change_queue)
         stats['display_iterations'] = self.display_iterations
         stats['death_rate'] = self.death_rate
         stats['birth_rate'] = self.birth_rate

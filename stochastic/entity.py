@@ -19,7 +19,7 @@ class Entity:
 
     def progress(self):
         if self.health > 0:
-            self.health = min(1, self.health + np.random.normal(-0.05, 0.1))
+            self.health = min(1, self.health + np.random.normal(-0.00, 0.1))
             self.age += 1
 
         if self.health < 0:

@@ -1,10 +1,11 @@
 import threading
 
 class EntityEngine(threading.Thread):
-    def __init__(self, simulation, stats_container, logger):
+    def __init__(self, simulation, sim_surface, stats_container, logger):
         threading.Thread.__init__(self)
 
         self.simulation = simulation
+        self.sim_surface = sim_surface
         self.stats = stats_container
         self.logger = logger
     # end def
@@ -12,7 +13,9 @@ class EntityEngine(threading.Thread):
     def run(self):
         while True:
             stats_thread = None
+            self.sim_surface.acquire_lock()
             self.simulation.tick()
+            self.sim_surface.release_lock()
 
             self.stats.increment_cycles()
             self.logger.info('cycle completed: %d' % (self.stats.cycles))

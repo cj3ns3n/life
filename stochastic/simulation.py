@@ -1,13 +1,11 @@
 import random
 from pos import Pos
 
-import constants
-
 
 class Simulation:
-    def __init__(self, land, change_queue, stats_container, logger):
+    def __init__(self, land, surface, stats_container, logger):
         self.land = land
-        self.change_queue = change_queue
+        self.surface = surface
         self.stats = stats_container
         self.logger = logger
     # end def
@@ -37,8 +35,7 @@ class Simulation:
                         new_cell = self.land[new_pos]
                         new_cell.entity = entity
                         cell.entity = None
-                        self.change_queue.add(new_cell)
-                        self.change_queue.add(cell)
+                        self.surface[new_pos.x, new_pos.y, :] = entity.calc_color()
                 # end def
             # end for x
         # end for y
@@ -50,6 +47,15 @@ class Simulation:
         self.logger.info('num vacancies: %d' % len(vacant_positions))
         if len(vacant_positions) == 4:
             return random.choice(vacant_positions)
+        elif len(vacant_positions) == 3:
+            if random.random() > 0.25:
+                return random.choice(vacant_positions)
+        elif len(vacant_positions) == 2:
+            if random.random() > 0.5:
+                return random.choice(vacant_positions)
+        elif len(vacant_positions) == 1:
+            if random.random() > 0.75:
+                return random.choice(vacant_positions)
         # end if
 
         return None

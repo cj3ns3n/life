@@ -8,9 +8,9 @@ from phenotypes.nutrient import Nutrient
 from cell import Cell
 
 class Simulation:
-    def __init__(self, land, change_queue, stats_container, logger):
+    def __init__(self, land, surface, stats_container, logger):
         self.land = land
-        self.change_queue = change_queue
+        self.surface = surface
         self.stats = stats_container
         self.logger = logger
     # end def
@@ -47,16 +47,25 @@ class Simulation:
                         # end if
                     # end if
 
-                    self.change_queue.add(cell)
+                    self.surface[cell.pos.x, cell.pos.y, :] = self.calc_cell_color(cell)
                 # end if
 
                 if nutrient and nutrient.nutrient_level > 0:
                     self.post_nutrient_progress(nutrient, pos)
                     self.stats.add_nutrient_stats(nutrient)
-                    self.change_queue.add(cell)
+                    self.surface[cell.pos.x, cell.pos.y, :] = self.calc_cell_color(cell)
                 # end if
             # end for x
         # end for y
+    # end def
+
+    def calc_cell_color(self, cell):
+        if cell.entity:
+            return cell.entity.calc_color(show_health=True)
+        elif cell.nutrient:
+            return (0, int(255*cell.nutrient.nutrient_level/100.0), 0)
+        else:
+            return (0, 0, 0)
     # end def
 
     def get_new_position(self, pos, preferred_dir):
@@ -200,14 +209,14 @@ class Simulation:
                 if cell.nutrient and cell.nutrient.nutrient_level > 0:
                     child = self.attempt_breeding(entity, neighbor_cells, new_pos)
                     if child:
-                        self.change_queue.add(self.land[new_pos])
+                        self.surface[new_pos.x, new_pos.y, :] = self.calc_cell_color(self.land[new_pos])
                 elif len(list(Cell.extract_children(neighbor_cells))) == 0:
                     # find new pos
                     self.land[new_pos].entity = entity
                     self.land[pos].entity = None
 
                     if new_pos.y != pos.y or new_pos.x != pos.x:
-                        self.change_queue.add(self.land[new_pos])
+                        self.surface[new_pos.x, new_pos.y, :] = entity.calc_color()
                 # end if nutrient
             # end if new_pos
         # end if
