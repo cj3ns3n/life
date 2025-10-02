@@ -30,7 +30,8 @@ class Entity:
   # end def
 
   def get_operation(self, neighborhood):
-    return operations.Move(direction.RIGHT)
+    move_dir = random.choice([direction.RIGHT, direction.LEFT, direction.UP, direction.DOWN])
+    return operations.Move(move_dir)
   # end def
 
   def illegal_move(self):
