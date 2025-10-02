@@ -1,6 +1,6 @@
 import logging
 
-from stochastic import random
+from numpy.random import random
 from entity import Entity
 from neighbors import Neighbors
 
