@@ -71,7 +71,7 @@ class World:
   # end def
 
   def move(self, src_pos, dest_pos):
-    if self.get_entity(dest_pos) is None:
+    if self.get_entity(src_pos) is None:
       raise ValueError(str(dest_pos) + ' is occupied')
 
     src_entity = self.get_entity(src_pos)
