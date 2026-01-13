@@ -44,6 +44,8 @@ class Simulation:
                         else:
                             self.stats.increment_natural_deaths(entity)
                             self.logger.info('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))
+                            # Remove dead entity from cell
+                            cell.entity = None
                         # end if
                     # end if
 
@@ -167,11 +169,21 @@ class Simulation:
                 if entity.health <= 0:
                     self.stats.increment_starvations(entity)
                     self.logger.info('starvation: %s; %d' % (repr(pos), self.stats.starvation_deaths))
+                    # Remove dead entity from cell to prevent double-counting
+                    cell.entity = None
             # end if
         # end if
     # end def
 
-    def attempt_breeding(self, entity, neighbor_cells, open_pos):
+    def find_entity_position(self, target_entity, neighbor_cells):
+        """Find which neighbor cell contains the target entity."""
+        for cell in neighbor_cells:
+            if cell.entity is target_entity:
+                return cell.pos
+        return None
+    # end def
+
+    def attempt_breeding(self, entity, entity_pos, neighbor_cells, open_pos):
         best_mate = self.find_mate(entity, neighbor_cells)
         child = None
 
@@ -185,6 +197,10 @@ class Simulation:
             if random.random() < Entity.birthing_death_rate or female_parent.health < Entity.birthing_min_health:
                 self.stats.increment_maternal_deaths()
                 female_parent.health = 0.0
+                # Remove dead mother from cell to prevent double-counting
+                female_parent_pos = entity_pos if entity.sex == constants.FEMALE else self.find_entity_position(best_mate, neighbor_cells)
+                if female_parent_pos:
+                    self.land[female_parent_pos].entity = None
             else:
                 # giving birth increases health; if it doesn't kill the entity
                 female_parent.health = female_parent.health * (1 + numpy.random.normal(Entity.birthing_health_bonus, Entity.birthing_health_bonus/10))
@@ -201,13 +217,17 @@ class Simulation:
         child = None
 
         self.manage_health(cell)
+        
+        # Check if entity died from starvation in manage_health
+        if cell.entity is None or entity.health <= 0:
+            return None
 
         neighbors = list(Cell.extract_entity_cells(neighbor_cells))
         if len(neighbors) < 4 and entity.age >= entity.mature_age:
             new_pos = self.get_new_position(pos, entity.preferred_direction)
             if new_pos:
                 if cell.nutrient and cell.nutrient.nutrient_level > 0:
-                    child = self.attempt_breeding(entity, neighbor_cells, new_pos)
+                    child = self.attempt_breeding(entity, pos, neighbor_cells, new_pos)
                     if child:
                         self.surface.set_color(new_pos, self.calc_cell_color(self.land[new_pos]))
                 elif len(list(Cell.extract_children(neighbor_cells))) == 0:

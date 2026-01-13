@@ -25,17 +25,20 @@ class Simulation:
                     entity.progress()
                     if entity.health > 0.0:
                         self.stats.add_entity_stats(entity)
+                        
+                        # Only move living entities
+                        new_pos = self.get_new_position(pos)
+                        if new_pos:
+                            new_cell = self.land[new_pos]
+                            new_cell.entity = entity
+                            cell.entity = None
+                            self.surface.set_color(new_pos, entity.calc_color())
                     else:
                         self.stats.increment_natural_deaths(entity)
                         self.logger.info('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))
-                    # end if
-
-                    new_pos = self.get_new_position(pos)
-                    if new_pos:
-                        new_cell = self.land[new_pos]
-                        new_cell.entity = entity
+                        # Remove dead entity from cell
                         cell.entity = None
-                        self.surface.set_color(new_pos, entity.calc_color())
+                    # end if
                 # end def
             # end for x
         # end for y
