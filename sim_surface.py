@@ -18,6 +18,25 @@ class SimulationSurface:
       return surface_array_cp
     # end def
 
+    def get_surface_array_bytes(self):
+      """Get RGBA bytes with Y-axis flipped for Pyglet (bottom-left origin)."""
+      self.acquire_lock()
+      surface_array_cp = self.surface_array.astype('uint8')
+      # Create RGBA array
+      out = np.empty((*surface_array_cp.shape[:2], 4), dtype=np.uint8)
+      out[..., :3] = surface_array_cp
+      out[..., 3] = 255
+      
+      # Flip Y-axis for Pyglet's bottom-left origin
+      # Transpose to get (height, width, channels) then flip Y
+      out_transposed = np.transpose(out, (1, 0, 2))  # (height, width, channels)
+      out_flipped = np.flipud(out_transposed)  # Flip vertically
+      
+      self.release_lock()
+      
+      return out_flipped.tobytes()
+    # end def
+
     def set_color(self, pos, color):
       self.surface_array[pos.x, pos.y, :] = color
     # end def

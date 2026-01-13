@@ -3,7 +3,8 @@ import pyglet
 class InfoText():
     green = (0, 255, 0, 255)
     blue = (0, 0, 128, 255)
-    initial_y_loc = 10
+    white = (255, 255, 255, 255)
+    initial_y_loc = 280  # Start from top of window (adjust based on window height)
 
     def __init__(self):
         # Pyglet labels will be created on-demand during blit
@@ -30,12 +31,12 @@ class InfoText():
             font_name='Arial',
             font_size=14,
             x=x_loc, y=y_loc,
-            color=InfoText.green,
-            anchor_x='left', anchor_y='bottom',
+            color=InfoText.white,
+            anchor_x='left', anchor_y='top',
             batch=batch
         )
         self.labels.append(label)
-        y_loc += 18
+        y_loc -= 20
         max_width = max(max_width, label.content_width)
 
         # Population
@@ -49,12 +50,12 @@ class InfoText():
             font_name='Arial',
             font_size=14,
             x=x_loc, y=y_loc,
-            color=InfoText.green,
-            anchor_x='left', anchor_y='bottom',
+            color=InfoText.white,
+            anchor_x='left', anchor_y='top',
             batch=batch
         )
         self.labels.append(label)
-        y_loc += 18
+        y_loc -= 20
         max_width = max(max_width, label.content_width)
 
         # Births and deaths
@@ -68,14 +69,14 @@ class InfoText():
         label = pyglet.text.Label(
             births_text_str,
             font_name='Arial',
-            font_size=14,
+            font_size=12,
             x=x_loc, y=y_loc,
-            color=InfoText.green,
-            anchor_x='left', anchor_y='bottom',
+            color=InfoText.white,
+            anchor_x='left', anchor_y='top',
             batch=batch
         )
         self.labels.append(label)
-        y_loc += 18
+        y_loc -= 20
         max_width = max(max_width, label.content_width)
 
         # Age stats
@@ -84,12 +85,12 @@ class InfoText():
             font_name='Arial',
             font_size=14,
             x=x_loc, y=y_loc,
-            color=InfoText.green,
-            anchor_x='left', anchor_y='bottom',
+            color=InfoText.white,
+            anchor_x='left', anchor_y='top',
             batch=batch
         )
         self.labels.append(label)
-        y_loc += 18
+        y_loc -= 20
         max_width = max(max_width, label.content_width)
 
         # Health stats
@@ -98,12 +99,12 @@ class InfoText():
             font_name='Arial',
             font_size=14,
             x=x_loc, y=y_loc,
-            color=InfoText.green,
-            anchor_x='left', anchor_y='bottom',
+            color=InfoText.white,
+            anchor_x='left', anchor_y='top',
             batch=batch
         )
         self.labels.append(label)
-        y_loc += 18
+        y_loc -= 20
         max_width = max(max_width, label.content_width)
 
         # Size stats
@@ -112,12 +113,12 @@ class InfoText():
             font_name='Arial',
             font_size=14,
             x=x_loc, y=y_loc,
-            color=InfoText.green,
-            anchor_x='left', anchor_y='bottom',
+            color=InfoText.white,
+            anchor_x='left', anchor_y='top',
             batch=batch
         )
         self.labels.append(label)
-        y_loc += 18
+        y_loc -= 20
         max_width = max(max_width, label.content_width)
 
         # Display refreshes
@@ -126,12 +127,12 @@ class InfoText():
             font_name='Arial',
             font_size=14,
             x=x_loc, y=y_loc,
-            color=InfoText.green,
-            anchor_x='left', anchor_y='bottom',
+            color=InfoText.white,
+            anchor_x='left', anchor_y='top',
             batch=batch
         )
         self.labels.append(label)
-        y_loc += 18
+        y_loc -= 20
         max_width = max(max_width, label.content_width)
 
         # Entity info
@@ -141,12 +142,12 @@ class InfoText():
             font_name='Arial',
             font_size=14,
             x=x_loc, y=y_loc,
-            color=InfoText.green,
-            anchor_x='left', anchor_y='bottom',
+            color=InfoText.white,
+            anchor_x='left', anchor_y='top',
             batch=batch
         )
         self.labels.append(label)
-        y_loc += 18
+        y_loc -= 20
         max_width = max(max_width, label.content_width)
 
         # Update rect dimensions

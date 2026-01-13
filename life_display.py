@@ -34,9 +34,16 @@ class LifeDisplay:
         self.width = sim_surface.surface_array.shape[0]
         self.height = sim_surface.surface_array.shape[1]
 
-        # Create Pyglet window
+        # Create main Pyglet window for simulation
         self.window = pyglet.window.Window(self.width, self.height, vsync=True, resizable=False)
         self.window.set_caption("It's alive")
+
+        # Create separate stats window
+        self.stats_window = pyglet.window.Window(500, 300, vsync=True, resizable=False)
+        self.stats_window.set_caption("Simulation Stats")
+        # Position stats window to the right of main window
+        self.stats_window.set_location(self.window.get_location()[0] + self.width + 10, 
+                                       self.window.get_location()[1])
 
         # Create RGBA buffer for Pyglet (needs alpha channel)
         self.buf = bytearray(self.width * self.height * 4)
@@ -51,11 +58,16 @@ class LifeDisplay:
         # Create batch for text rendering
         self.text_batch = pyglet.graphics.Batch()
 
-        # Register event handlers
-        self.window.on_draw = self.on_draw
+        # Register event handlers for main window
+        self.window.on_draw = self.on_draw_main
         self.window.on_key_press = self.on_key_press
         self.window.on_mouse_motion = self.on_mouse_motion
         self.window.on_close = self.on_close
+
+        # Register event handlers for stats window
+        self.stats_window.on_draw = self.on_draw_stats
+        self.stats_window.on_key_press = self.on_key_press
+        self.stats_window.on_close = self.on_close
 
         self.logger.info('display initialized')
     # end def
@@ -74,39 +86,34 @@ class LifeDisplay:
         )
     # end def
 
-    def on_draw(self):
-        """Pyglet draw event handler."""
+    def on_draw_main(self):
+        """Pyglet draw event handler for main simulation window."""
         self.window.clear()
         
         # Draw the simulation texture
         self.tex.blit(0, 0, width=self.window.width, height=self.window.height)
+    # end def
+
+    def on_draw_stats(self):
+        """Pyglet draw event handler for stats window."""
+        self.stats_window.clear()
         
-        # Draw stats overlay if enabled
-        if self.show_stats_overlay:
+        # Draw stats if window is visible
+        if self.show_stats_overlay and self.stats_window.visible:
             # Clear the batch and recreate labels
             self.text_batch = pyglet.graphics.Batch()
             self.infoText.blit(self.text_batch, self.stats)
-            
-            # Draw background rectangle for text readability
-            rect = self.infoText.get_rect()
-            if rect:
-                x, y, w, h = rect
-                # Draw semi-transparent blue background
-                pyglet.shapes.Rectangle(
-                    x - 5, y - 5, w + 10, h + 10,
-                    color=(0, 0, 128, 180),
-                    batch=self.text_batch
-                )
             
             # Draw all text labels
             self.text_batch.draw()
     # end def
 
     def on_key_press(self, symbol, modifiers):
-        """Pyglet keyboard event handler."""
+        """Pyglet keyboard event handler (works on both windows)."""
         if symbol == key.ESCAPE:
             self.game_running = False
             self.window.close()
+            self.stats_window.close()
         elif symbol == key.E:
             self.show_entity = not self.show_entity
         elif symbol == key._1:
@@ -121,6 +128,8 @@ class LifeDisplay:
             self.show_land = not self.show_land
         elif symbol == key.O:
             self.show_stats_overlay = not self.show_stats_overlay
+            # Toggle stats window visibility
+            self.stats_window.set_visible(self.show_stats_overlay)
     # end def
 
     def on_mouse_motion(self, x, y, dx, dy):
@@ -133,8 +142,17 @@ class LifeDisplay:
     # end def
 
     def on_close(self):
-        """Pyglet window close event handler."""
+        """Pyglet window close event handler (closes both windows)."""
         self.game_running = False
+        # Close both windows
+        try:
+            self.window.close()
+        except:
+            pass
+        try:
+            self.stats_window.close()
+        except:
+            pass
         self.logger.shutdown()
         return pyglet.event.EVENT_HANDLED
     # end def
@@ -145,22 +163,10 @@ class LifeDisplay:
             pyglet.app.exit()
             return
 
-        # Get the simulation surface array (RGB numpy array)
-        surface_array = self.sim_surface.get_surface_array()
-
-        # Convert RGB numpy array to RGBA buffer for Pyglet
-        # Note: Pyglet uses bottom-left origin, so we need to flip Y
-        for y in range(self.height):
-            # Flip Y coordinate for Pyglet's bottom-left origin
-            flipped_y = self.height - 1 - y
-            row_start = flipped_y * self.width * 4
-            for x in range(self.width):
-                i = row_start + x * 4
-                # RGB from numpy array
-                self.buf[i + 0] = int(surface_array[x, y, 0])  # R
-                self.buf[i + 1] = int(surface_array[x, y, 1])  # G
-                self.buf[i + 2] = int(surface_array[x, y, 2])  # B
-                self.buf[i + 3] = 255  # A (fully opaque)
+        # Get the simulation surface array as bytes
+        new_data = self.sim_surface.get_surface_array_bytes()
+        # Copy into our buffer
+        self.buf[:] = new_data
 
         # Upload to GPU
         self.upload_texture()
