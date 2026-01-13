@@ -21,6 +21,13 @@ class Simulation:
                 pos = Pos(x, y)
                 cell = self.land[pos]
                 entity = cell.entity
+                
+                # Clean up any dead entities that weren't processed
+                if entity and entity.health <= 0:
+                    cell.entity = None
+                    entity = None
+                # end if
+                
                 if entity:
                     entity.progress()
                     if entity.health > 0.0:
@@ -32,6 +39,7 @@ class Simulation:
                             new_cell = self.land[new_pos]
                             new_cell.entity = entity
                             cell.entity = None
+                            # Update new position (old position will be updated at end of loop)
                             self.surface.set_color(new_pos, entity.calc_color())
                     else:
                         self.stats.increment_natural_deaths(entity)
@@ -39,7 +47,13 @@ class Simulation:
                         # Remove dead entity from cell
                         cell.entity = None
                     # end if
-                # end def
+                # end if
+                
+                # Update display for every cell at the end to ensure sync
+                if cell.entity:
+                    self.surface.set_color(pos, cell.entity.calc_color())
+                else:
+                    self.surface.set_color(pos, (0, 0, 0))
             # end for x
         # end for y
     # end def

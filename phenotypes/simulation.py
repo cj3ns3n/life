@@ -28,6 +28,12 @@ class Simulation:
                 entity = cell.entity
                 nutrient = cell.nutrient
 
+                # Clean up any dead entities that weren't processed
+                if entity is not None and entity.health <= 0:
+                    cell.entity = None
+                    entity = None
+                # end if
+
                 if entity is not None and entity.health > 0:
                     if entity.cycle < self.stats.cycles:
                         neighbor_cells = self.land.get_neighbors_cells(pos)
@@ -48,24 +54,50 @@ class Simulation:
                             cell.entity = None
                         # end if
                     # end if
-
-                    self.surface.set_color(cell.pos, self.calc_cell_color(cell))
                 # end if
 
                 if nutrient and nutrient.nutrient_level > 0:
                     self.post_nutrient_progress(nutrient, pos)
                     self.stats.add_nutrient_stats(nutrient)
-                    self.surface.set_color(cell.pos, self.calc_cell_color(cell))
                 # end if
+                
+                # Update display for every cell at the end to ensure sync
+                self.surface.set_color(cell.pos, self.calc_cell_color(cell))
             # end for x
         # end for y
+        
+        # Final pass: ensure all cells are correctly displayed (catch any edge cases)
+        actual_entity_count = 0
+        for y in range(self.land.height):
+            for x in range(self.land.width):
+                pos = Pos(x, y)
+                cell = self.land[pos]
+                # If cell has a dead entity, remove it
+                if cell.entity and cell.entity.health <= 0:
+                    self.logger.info('FOUND DEAD ENTITY at %s with health %s' % (repr(pos), cell.entity.health))
+                    cell.entity = None
+                # Count living entities
+                if cell.entity and cell.entity.health > 0:
+                    actual_entity_count += 1
+                # Update display
+                self.surface.set_color(pos, self.calc_cell_color(cell))
+            # end for
+        # end for
+        
+        # Log entity count for debugging
+        population = self.stats.births_count - self.stats.maternal_deaths - self.stats.natural_deaths - self.stats.starvation_deaths
+        if actual_entity_count != population:
+            self.logger.info('MISMATCH: actual=%d, calculated=%d, births=%d, deaths(m=%d,n=%d,s=%d)' % 
+                           (actual_entity_count, population, self.stats.births_count,
+                            self.stats.maternal_deaths, self.stats.natural_deaths, self.stats.starvation_deaths))
     # end def
 
     def calc_cell_color(self, cell):
         if cell.entity:
             return cell.entity.calc_color(show_health=True)
         elif cell.nutrient:
-            return (0, int(255*cell.nutrient.nutrient_level/100.0), 0)
+            return (0, 0, 0)
+            #return (0, int(255*cell.nutrient.nutrient_level/100.0), 0)
         else:
             return (0, 0, 0)
     # end def
@@ -171,6 +203,8 @@ class Simulation:
                     self.logger.info('starvation: %s; %d' % (repr(pos), self.stats.starvation_deaths))
                     # Remove dead entity from cell to prevent double-counting
                     cell.entity = None
+                    # Update display to show empty cell
+                    self.surface.set_color(cell.pos, self.calc_cell_color(cell))
             # end if
         # end if
     # end def
@@ -201,6 +235,8 @@ class Simulation:
                 female_parent_pos = entity_pos if entity.sex == constants.FEMALE else self.find_entity_position(best_mate, neighbor_cells)
                 if female_parent_pos:
                     self.land[female_parent_pos].entity = None
+                    # Update display to show empty cell
+                    self.surface.set_color(female_parent_pos, self.calc_cell_color(self.land[female_parent_pos]))
             else:
                 # giving birth increases health; if it doesn't kill the entity
                 female_parent.health = female_parent.health * (1 + numpy.random.normal(Entity.birthing_health_bonus, Entity.birthing_health_bonus/10))
@@ -236,7 +272,10 @@ class Simulation:
                     self.land[pos].entity = None
 
                     if new_pos.y != pos.y or new_pos.x != pos.x:
+                        # Update new position with entity
                         self.surface.set_color(new_pos, entity.calc_color())
+                        # Update old position to show it's empty (or show nutrients)
+                        self.surface.set_color(pos, self.calc_cell_color(self.land[pos]))
                 # end if nutrient
             # end if new_pos
         # end if
