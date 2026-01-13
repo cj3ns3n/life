@@ -112,7 +112,7 @@ class StatsContainer:
     def increment_cycles(self):
         self.cycles += 1
 
-        population = self.births_count - self.maternal_deaths - self.natural_deaths
+        population = self.births_count - self.maternal_deaths - self.natural_deaths - self.starvation_deaths
         self.birth_rate = 0 if population == 0 else float(self.cycle_births) / float(population)
         self.cycle_births = 0
 

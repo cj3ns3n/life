@@ -41,7 +41,7 @@ class InfoText():
 
         # Population
         pop_text_str = 'Population %03d; Males %03d; Females %03d' % (
-            stats['births'] - stats['maternal_deaths'] - stats['natural_deaths'], 
+            stats['births'] - stats['maternal_deaths'] - stats['natural_deaths'] - stats['starvation_deaths'], 
             stats['males'], 
             stats['females']
         )

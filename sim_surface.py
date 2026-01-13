@@ -33,12 +33,12 @@ class SimulationSurface:
 
     def get_surface_array_bytes(self):
       """Get RGBA bytes buffer (fast, no conversion needed)."""
-      self.acquire_lock()
+      #self.acquire_lock()
       # Swap buffers - what was being written is now ready to read
-      self.read_buffer, self.write_buffer = self.write_buffer, self.read_buffer
+      #self.read_buffer, self.write_buffer = self.write_buffer, self.read_buffer
       # Copy read buffer to return (so caller gets stable data)
-      result = bytes(self.read_buffer)
-      self.release_lock()
+      result = self.write_buffer
+      #self.release_lock()
       
       return result
     # end def
