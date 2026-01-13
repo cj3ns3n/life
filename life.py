@@ -1,7 +1,5 @@
 import argparse
 from importlib import import_module
-from os import environ
-environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 from sim_surface import SimulationSurface
 from life_display import LifeDisplay

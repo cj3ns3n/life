@@ -1,6 +1,6 @@
-The game of life is a classic computer simulation application. It has fasinated me since I was young.  I took some time and implemented my own.  I also wanted to experiment with [PyGame](https://www.pygame.org/news) and this seemed like a good opportunity (though I did try to make it modular so a different display framework could be used). 
+The game of life is a classic computer simulation application. It has fasinated me since I was young.  I took some time and implemented my own.  I also wanted to experiment with graphics frameworks and this seemed like a good opportunity (I made it modular so different display frameworks could be used). 
 
-Note: there are probably better options than PyGame for this, but it was just an experiment.\
+This implementation uses [Pyglet](https://pyglet.org/) for efficient OpenGL-based rendering.
 
 ![simulation screenshot](https://raw.githubusercontent.com/cj3ns3n/life/main/life-0001830.jpg)
 
@@ -13,6 +13,6 @@ The simulation is made of individual living "entity".  Each entity is assigned t
 The entity_engine is a simple loop that goes through all entities and updates their state based on the rules of the simulation.
 
 ### Display
-The simulation uses PyGame to display a grid where every pixel displays an entity where the color is an indicator of the state of the entity (age, health, etc).  Various stats are overlayed on the display.  Various keys can be used to show or hide the stats and control the color mapping of the entities.
+The simulation uses Pyglet to display a grid where every pixel displays an entity where the color is an indicator of the state of the entity (age, health, etc).  Various stats are overlayed on the display.  Various keys can be used to show or hide the stats and control the color mapping of the entities.
 
 The simulation also produces output to the shell using curses.  Various stats and state and control information is displayed and updates with each iteration of the simulation.

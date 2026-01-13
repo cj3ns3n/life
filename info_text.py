@@ -1,83 +1,167 @@
-import pygame
+import pyglet
 
 class InfoText():
-    green = (0, 255, 0)
-    blue = (0, 0, 128)
+    green = (0, 255, 0, 255)
+    blue = (0, 0, 128, 255)
     initial_y_loc = 10
 
     def __init__(self):
-        self.font = pygame.font.Font(None, 18)
-
+        # Pyglet labels will be created on-demand during blit
+        self.labels = []
         self.display_count = 0
         self.entity = None
-        self.rect = pygame.Rect(0, 0, 0, 0)
+        self.rect_x = 0
+        self.rect_y = 0
+        self.rect_width = 0
+        self.rect_height = 0
     # end def
 
-    def blit(self, surface, stats_container):
-        y_loc = InfoText.initial_y_loc
+    def blit(self, batch, stats_container):
+        """Create Pyglet labels for stats overlay. Returns list of labels to draw."""
+        y_loc = self.initial_y_loc
+        self.labels = []
         stats = stats_container.get_stats()
+        x_loc = 10
+        max_width = 0
 
-        gen_text = self.font.render('Cycles %d' % stats['cycles'], True, InfoText.green, InfoText.blue)
-        gen_text_rec = gen_text.get_rect()
-        gen_text_rec.topleft = (10, y_loc)
-        surface.blit(gen_text, gen_text_rec)
-        y_loc += gen_text_rec.height
+        # Cycles
+        label = pyglet.text.Label(
+            'Cycles %d' % stats['cycles'],
+            font_name='Arial',
+            font_size=14,
+            x=x_loc, y=y_loc,
+            color=InfoText.green,
+            anchor_x='left', anchor_y='bottom',
+            batch=batch
+        )
+        self.labels.append(label)
+        y_loc += 18
+        max_width = max(max_width, label.content_width)
 
-        pop_text_str = 'Population %03d; Males %03d; Females %03d' % (stats['births'] - stats['maternal_deaths'] - stats['natural_deaths'], stats['males'], stats['females'])
-        pop_text = self.font.render(pop_text_str, True, InfoText.green, InfoText.blue)
-        pop_text_rec = pop_text.get_rect()
-        pop_text_rec.topleft = (10, y_loc)
-        surface.blit(pop_text, pop_text_rec)
-        y_loc += pop_text_rec.height
+        # Population
+        pop_text_str = 'Population %03d; Males %03d; Females %03d' % (
+            stats['births'] - stats['maternal_deaths'] - stats['natural_deaths'], 
+            stats['males'], 
+            stats['females']
+        )
+        label = pyglet.text.Label(
+            pop_text_str,
+            font_name='Arial',
+            font_size=14,
+            x=x_loc, y=y_loc,
+            color=InfoText.green,
+            anchor_x='left', anchor_y='bottom',
+            batch=batch
+        )
+        self.labels.append(label)
+        y_loc += 18
+        max_width = max(max_width, label.content_width)
 
+        # Births and deaths
         births = stats['births']
         m_deaths = stats['maternal_deaths']
         n_deaths = stats['natural_deaths']
         m_deathrate = 100.0 * float(m_deaths) / float(births) if births > 0 else 0.0
-        births_text_str = 'Births: %02d; (birth rate: %0.1f) Maternal Deaths: %02d (rate: %0.1f%%); Natural Deaths: %02d (death rate: %0.1f%%)' % (births, stats['birth_rate']*100, m_deaths, m_deathrate, n_deaths, stats['death_rate']*100)
-        births_text = self.font.render(births_text_str, True, InfoText.green, InfoText.blue)
-        births_text_rec = births_text.get_rect()
-        births_text_rec.topleft = (10, y_loc)
-        surface.blit(births_text, births_text_rec)
-        y_loc += births_text_rec.height
+        births_text_str = 'Births: %02d; (birth rate: %0.1f) Maternal Deaths: %02d (rate: %0.1f%%); Natural Deaths: %02d (death rate: %0.1f%%)' % (
+            births, stats['birth_rate']*100, m_deaths, m_deathrate, n_deaths, stats['death_rate']*100
+        )
+        label = pyglet.text.Label(
+            births_text_str,
+            font_name='Arial',
+            font_size=14,
+            x=x_loc, y=y_loc,
+            color=InfoText.green,
+            anchor_x='left', anchor_y='bottom',
+            batch=batch
+        )
+        self.labels.append(label)
+        y_loc += 18
+        max_width = max(max_width, label.content_width)
 
-        age_text = self.font.render('Avg Age: %.1f, Stdv Age: %.1f' % (stats['age_avg'], stats['age_stdev']), True, InfoText.green, InfoText.blue)
-        age_text_rec = age_text.get_rect()
-        age_text_rec.topleft = (10, y_loc)
-        surface.blit(age_text, age_text_rec)
-        y_loc += age_text_rec.height
+        # Age stats
+        label = pyglet.text.Label(
+            'Avg Age: %.1f, Stdv Age: %.1f' % (stats['age_avg'], stats['age_stdev']),
+            font_name='Arial',
+            font_size=14,
+            x=x_loc, y=y_loc,
+            color=InfoText.green,
+            anchor_x='left', anchor_y='bottom',
+            batch=batch
+        )
+        self.labels.append(label)
+        y_loc += 18
+        max_width = max(max_width, label.content_width)
 
-        health_text = self.font.render('Avg Health: %.1f, Stdv Health: %.1f' % (stats['health_avg'], stats['health_stdev']), True, InfoText.green, InfoText.blue)
-        health_text_rec = health_text.get_rect()
-        health_text_rec.topleft = (10, y_loc)
-        surface.blit(health_text, health_text_rec)
-        y_loc += health_text_rec.height
+        # Health stats
+        label = pyglet.text.Label(
+            'Avg Health: %.1f, Stdv Health: %.1f' % (stats['health_avg'], stats['health_stdev']),
+            font_name='Arial',
+            font_size=14,
+            x=x_loc, y=y_loc,
+            color=InfoText.green,
+            anchor_x='left', anchor_y='bottom',
+            batch=batch
+        )
+        self.labels.append(label)
+        y_loc += 18
+        max_width = max(max_width, label.content_width)
 
-        size_text = self.font.render('Avg Size: %.1f, Stdv Size: %.1f' % (stats['size_avg'], stats['size_stdev']), True, InfoText.green, InfoText.blue)
-        size_text_rec = size_text.get_rect()
-        size_text_rec.topleft = (10, y_loc)
-        surface.blit(size_text, size_text_rec)
-        y_loc += size_text_rec.height
+        # Size stats
+        label = pyglet.text.Label(
+            'Avg Size: %.1f, Stdv Size: %.1f' % (stats['size_avg'], stats['size_stdev']),
+            font_name='Arial',
+            font_size=14,
+            x=x_loc, y=y_loc,
+            color=InfoText.green,
+            anchor_x='left', anchor_y='bottom',
+            batch=batch
+        )
+        self.labels.append(label)
+        y_loc += 18
+        max_width = max(max_width, label.content_width)
 
-        display_text = self.font.render('Refreshes %d' % stats['display_iterations'], True, InfoText.green, InfoText.blue)
-        display_text_rec = display_text.get_rect()
-        display_text_rec.topleft = (10, y_loc)
-        surface.blit(display_text, display_text_rec)
-        y_loc += display_text_rec.height
+        # Display refreshes
+        label = pyglet.text.Label(
+            'Refreshes %d' % stats['display_iterations'],
+            font_name='Arial',
+            font_size=14,
+            x=x_loc, y=y_loc,
+            color=InfoText.green,
+            anchor_x='left', anchor_y='bottom',
+            batch=batch
+        )
+        self.labels.append(label)
+        y_loc += 18
+        max_width = max(max_width, label.content_width)
 
+        # Entity info
         entity_text = self.get_entity_text()
-        entity_text_rec = entity_text.get_rect()
-        entity_text_rec.topleft = (10, y_loc)
-        surface.blit(entity_text, entity_text_rec)
-        y_loc += entity_text_rec.height
+        label = pyglet.text.Label(
+            entity_text,
+            font_name='Arial',
+            font_size=14,
+            x=x_loc, y=y_loc,
+            color=InfoText.green,
+            anchor_x='left', anchor_y='bottom',
+            batch=batch
+        )
+        self.labels.append(label)
+        y_loc += 18
+        max_width = max(max_width, label.content_width)
 
+        # Update rect dimensions
         height = y_loc - InfoText.initial_y_loc
-        width = max([gen_text_rec.width, births_text_rec.width, age_text_rec.width, health_text_rec.width, size_text_rec.width, display_text_rec.width, entity_text_rec.width])
-        self.rect = pygame.Rect(gen_text_rec.left, gen_text_rec.top, width, height)
+        self.rect_x = x_loc
+        self.rect_y = InfoText.initial_y_loc
+        self.rect_width = max_width
+        self.rect_height = height
+        
+        return self.labels
     # end def
 
     def get_rect(self):
-        return self.rect
+        """Returns a tuple (x, y, width, height) for compatibility."""
+        return (self.rect_x, self.rect_y, self.rect_width, self.rect_height)
     # end def
 
     def set_entity(self, entity, entity_pos):
@@ -88,8 +172,6 @@ class InfoText():
         entity_text = 'Entity: None'
         if self.entity:
             entity_text = 'Entity: %s %s' % (str(self.entity_pos), str(self.entity))
-
-        text = self.font.render(entity_text, True, InfoText.green, InfoText.blue)
-        return text
+        return entity_text
     # end def
-# end def
+# end class
