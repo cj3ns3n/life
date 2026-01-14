@@ -54,7 +54,16 @@ class TerminalDisplay:
         self.scr.addstr(4, 0, 'Avg Age: %.1f, Stdv Age: %.1f' % (stats['age_avg'], stats['age_stdev']))
         self.scr.addstr(5, 0, 'Avg Health: %.1f, Stdv Health: %.1f' % (stats['health_avg'], stats['health_stdev']))
         self.scr.addstr(6, 0, 'Avg Size: %.1f, Stdv Size: %.1f' % (stats['size_avg'], stats['size_stdev']))
-        self.scr.addstr(7, 0, 'Nutrient Sources: %s, Avg Nutrient Level: %.1f, Stdv Nutrient Level: %.1f' % (self.comma_number(stats['nutrient_sources']), stats['nutrient_level_avg'], stats['nutrient_level_stdev']))
+        self.scr.addstr(
+            7,
+            0,
+            'Nutrient Cells: %s, Total Nutrients: %.1f, Avg Nutrient Level: %.1f, Stdv Nutrient Level: %.1f' % (
+                self.comma_number(stats['nutrient_cells_count']),
+                stats['nutrient_level_sum'],
+                stats['nutrient_level_avg'],
+                stats['nutrient_level_stdev']
+            )
+        )
         self.scr.addstr(8, 0, 'Refreshes %s' % self.comma_number(stats['display_iterations']))
 
         self.terminal_lock.acquire()

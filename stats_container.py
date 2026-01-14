@@ -35,6 +35,8 @@ class StatsContainer:
         self.nutrient_sources     = 0
         self.nutrient_level_avg   = 0
         self.nutrient_level_stdev = 0
+        self.nutrient_level_sum   = 0
+        self.nutrient_cells_count = 0
     # end init
 
     def get_stats(self):
@@ -60,6 +62,8 @@ class StatsContainer:
         stats['nutrient_sources'] = self.nutrient_sources
         stats['nutrient_level_avg'] = self.nutrient_level_avg
         stats['nutrient_level_stdev'] = self.nutrient_level_stdev
+        stats['nutrient_level_sum'] = self.nutrient_level_sum
+        stats['nutrient_cells_count'] = self.nutrient_cells_count
 
         return stats
     # end def
@@ -79,11 +83,18 @@ class StatsContainer:
             self.sizes = []
         # end if
 
-        if len(self.nutrient_levels) > 1:
+        if len(self.nutrient_levels) > 0:
+            self.nutrient_level_sum = sum(self.nutrient_levels)
+            self.nutrient_cells_count = len(self.nutrient_levels)
             self.nutrient_level_avg = statistics.mean(self.nutrient_levels)
-            self.nutrient_level_stdev = statistics.stdev(self.nutrient_levels)
+            self.nutrient_level_stdev = statistics.stdev(self.nutrient_levels) if len(self.nutrient_levels) > 1 else 0
 
             self.nutrient_levels = []
+        else:
+            self.nutrient_level_sum = 0
+            self.nutrient_cells_count = 0
+            self.nutrient_level_avg = 0
+            self.nutrient_level_stdev = 0
         # end if
     # end def
 

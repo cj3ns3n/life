@@ -121,6 +121,24 @@ class InfoText():
         y_loc -= 20
         max_width = max(max_width, label.content_width)
 
+        # Nutrient stats
+        nutrient_text = 'Nutrients: cells %d, total %.1f' % (
+            stats['nutrient_cells_count'],
+            stats['nutrient_level_sum']
+        )
+        label = pyglet.text.Label(
+            nutrient_text,
+            font_name='Arial',
+            font_size=14,
+            x=x_loc, y=y_loc,
+            color=InfoText.white,
+            anchor_x='left', anchor_y='top',
+            batch=batch
+        )
+        self.labels.append(label)
+        y_loc -= 20
+        max_width = max(max_width, label.content_width)
+
         # Display refreshes
         label = pyglet.text.Label(
             'Refreshes %d' % stats['display_iterations'],
