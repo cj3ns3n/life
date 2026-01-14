@@ -22,9 +22,12 @@ class LifeDisplay:
         self.show_aspect_1 = False
         self.show_aspect_2 = False
         self.show_aspect_3 = False
-        self.show_sparkles = True
+        self.show_sparkles = False
         self.show_stats_overlay = True  # Changed default to True to show stats
         self.show_land = True
+
+        # Mirror display flags to stats so simulation can access them
+        self._sync_display_flags()
 
         self.changed_cells = []
         self.last_mouse_pos = Pos(0, 0)
@@ -116,20 +119,36 @@ class LifeDisplay:
             self.stats_window.close()
         elif symbol == key.E:
             self.show_entity = not self.show_entity
+            self._sync_display_flags()
         elif symbol == key._1:
             self.show_aspect_1 = not self.show_aspect_1
+            self._sync_display_flags()
         elif symbol == key._2:
             self.show_aspect_2 = not self.show_aspect_2
+            self._sync_display_flags()
         elif symbol == key._3:
             self.show_aspect_3 = not self.show_aspect_3
+            self._sync_display_flags()
         elif symbol == key.B:
             self.show_sparkles = not self.show_sparkles
+            self._sync_display_flags()
         elif symbol == key.N:
             self.show_land = not self.show_land
+            self._sync_display_flags()
         elif symbol == key.O:
             self.show_stats_overlay = not self.show_stats_overlay
             # Toggle stats window visibility
             self.stats_window.set_visible(self.show_stats_overlay)
+    # end def
+
+    def _sync_display_flags(self):
+        """Copy display flags into stats container for simulation access."""
+        self.stats.show_entity = self.show_entity
+        self.stats.show_aspect_1 = self.show_aspect_1
+        self.stats.show_aspect_2 = self.show_aspect_2
+        self.stats.show_aspect_3 = self.show_aspect_3
+        self.stats.show_sparkles = self.show_sparkles
+        self.stats.show_land = self.show_land
     # end def
 
     def on_mouse_motion(self, x, y, dx, dy):

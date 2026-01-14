@@ -131,6 +131,11 @@ class Simulation:
 
     def calc_cell_color(self, cell):
         if cell.entity:
+            if self.stats.show_aspect_1:
+                # Show sex: bright blue for males, pink for females
+                if cell.entity.sex == constants.MALE:
+                    return (0, 0, 255)
+                return (255, 105, 180)
             return cell.entity.calc_color(show_health=True)
         elif cell.nutrient:
             return (0, 0, 0)

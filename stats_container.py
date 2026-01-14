@@ -37,6 +37,14 @@ class StatsContainer:
         self.nutrient_level_stdev = 0
         self.nutrient_level_sum   = 0
         self.nutrient_cells_count = 0
+
+        # Display toggles (controlled by LifeDisplay)
+        self.show_aspect_1 = False
+        self.show_aspect_2 = False
+        self.show_aspect_3 = False
+        self.show_entity = True
+        self.show_sparkles = False
+        self.show_land = True
     # end init
 
     def get_stats(self):
