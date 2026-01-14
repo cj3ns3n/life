@@ -13,83 +13,120 @@ class Simulation:
         self.surface = surface
         self.stats = stats_container
         self.logger = logger
+        
+        # Active entity tracking: maps entity -> position
+        self.entities = {}
+        
+        # Initialize with existing entities in the grid
+        self._initialize_entity_tracking()
+    # end def
+    
+    def _initialize_entity_tracking(self):
+        """Scan the grid once to build the initial active entity list."""
+        for y in range(self.land.height):
+            for x in range(self.land.width):
+                pos = Pos(x, y)
+                entity = self.land[pos].entity
+                if entity and entity.health > 0:
+                    self.entities[entity] = pos
+        self.logger.info('Initialized with %d active entities' % len(self.entities))
+    # end def
+    
+    def register_entity(self, entity, pos):
+        """Add entity to active tracking."""
+        self.entities[entity] = pos
+    # end def
+    
+    def unregister_entity(self, entity):
+        """Remove entity from active tracking."""
+        if entity in self.entities:
+            del self.entities[entity]
+    # end def
+    
+    def move_entity(self, entity, old_pos, new_pos):
+        """Update entity position in tracking."""
+        if entity in self.entities:
+            self.entities[entity] = new_pos
     # end def
 
     def tick(self):
-        # shuffle the processing of rows and columns to avoid bias artifacts
-        y_positions = list(range(self.land.height))
-        random.shuffle(y_positions)
-        for y in y_positions:
-            x_positions = list(range(self.land.width))
-            random.shuffle(x_positions)
-            for x in x_positions:
-                pos = Pos(x, y)
-                cell = self.land[pos]
-                entity = cell.entity
-                nutrient = cell.nutrient
-
-                # Clean up any dead entities that weren't processed
-                if entity is not None and entity.health <= 0:
-                    cell.entity = None
-                    entity = None
-                # end if
-
-                if entity is not None and entity.health > 0:
-                    if entity.cycle < self.stats.cycles:
-                        neighbor_cells = self.land.get_neighbors_cells(pos)
-                        random.shuffle(neighbor_cells)
-                        if self.stats.cycles == 0:
-                            # add initial entities to births
-                            self.stats.increment_births(entity)
-                        # end if
-
-                        entity.progress(neighbor_cells, self.stats.cycles)
-                        if entity.health > 0.0:
-                            self.stats.add_entity_stats(entity)
-                            self.post_entity_progress(cell, neighbor_cells)
-                        else:
-                            self.stats.increment_natural_deaths(entity)
-                            self.logger.info('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))
-                            # Remove dead entity from cell
-                            cell.entity = None
-                        # end if
-                    # end if
-                # end if
-
-                if nutrient and nutrient.nutrient_level > 0:
-                    self.post_nutrient_progress(nutrient, pos)
-                    self.stats.add_nutrient_stats(nutrient)
+        # Process only active entities (much more efficient than scanning entire grid)
+        entities_list = list(self.entities.items())
+        random.shuffle(entities_list)  # Shuffle for fairness
+        
+        entities_to_remove = []
+        
+        # Process each active entity
+        for entity, pos in entities_list:
+            # Verify entity still exists in tracking (might have died from maternal death, etc)
+            if entity not in self.entities:
+                continue
+            
+            # Get current cell
+            cell = self.land[pos]
+            
+            # Verify entity is still at this position (should always be true with our tracking)
+            if cell.entity != entity:
+                self.logger.info('WARNING: Entity position mismatch at %s' % repr(pos))
+                entities_to_remove.append(entity)
+                continue
+            
+            # Process entity if not already processed this cycle
+            if entity.cycle < self.stats.cycles:
+                neighbor_cells = self.land.get_neighbors_cells(pos)
+                random.shuffle(neighbor_cells)
+                
+                if self.stats.cycles == 0:
+                    # add initial entities to births
+                    self.stats.increment_births(entity)
                 # end if
                 
-                # Update display for every cell at the end to ensure sync
-                self.surface.set_color(cell.pos, self.calc_cell_color(cell))
-            # end for x
-        # end for y
+                entity.progress(neighbor_cells, self.stats.cycles)
+                
+                if entity.health > 0.0:
+                    self.stats.add_entity_stats(entity)
+                    self.post_entity_progress(cell, neighbor_cells)
+                else:
+                    # Natural death
+                    self.stats.increment_natural_deaths(entity)
+                    self.logger.info('natural death: %s; %d' % (repr(pos), self.stats.natural_deaths))
+                    cell.entity = None
+                    entities_to_remove.append(entity)
+                # end if
+            # end if
+        # end for
         
-        # Final pass: ensure all cells are correctly displayed (catch any edge cases)
-        actual_entity_count = 0
+        # Remove dead entities from tracking
+        for entity in entities_to_remove:
+            self.unregister_entity(entity)
+        
+        # Process nutrients (still need to scan grid for this)
         for y in range(self.land.height):
             for x in range(self.land.width):
                 pos = Pos(x, y)
                 cell = self.land[pos]
-                # If cell has a dead entity, remove it
-                if cell.entity and cell.entity.health <= 0:
-                    self.logger.info('FOUND DEAD ENTITY at %s with health %s' % (repr(pos), cell.entity.health))
-                    cell.entity = None
-                # Count living entities
-                if cell.entity and cell.entity.health > 0:
-                    actual_entity_count += 1
-                # Update display
+                nutrient = cell.nutrient
+                
+                if nutrient and nutrient.nutrient_level > 0:
+                    self.post_nutrient_progress(nutrient, pos)
+                    self.stats.add_nutrient_stats(nutrient)
+                # end if
+            # end for x
+        # end for y
+        
+        # Final pass: update display for all cells
+        for y in range(self.land.height):
+            for x in range(self.land.width):
+                pos = Pos(x, y)
+                cell = self.land[pos]
                 self.surface.set_color(pos, self.calc_cell_color(cell))
             # end for
         # end for
         
-        # Log entity count for debugging
-        population = self.stats.births_count - self.stats.maternal_deaths - self.stats.natural_deaths - self.stats.starvation_deaths
-        if actual_entity_count != population:
-            self.logger.info('MISMATCH: actual=%d, calculated=%d, births=%d, deaths(m=%d,n=%d,s=%d)' % 
-                           (actual_entity_count, population, self.stats.births_count,
-                            self.stats.maternal_deaths, self.stats.natural_deaths, self.stats.starvation_deaths))
+        # Verify tracking matches calculated population
+        expected_pop = self.stats.births_count - self.stats.maternal_deaths - self.stats.natural_deaths - self.stats.starvation_deaths
+        if len(self.entities) != expected_pop:
+            self.logger.info('TRACKING MISMATCH: tracked=%d, calculated=%d' % (len(self.entities), expected_pop))
     # end def
 
     def calc_cell_color(self, cell):
@@ -203,6 +240,8 @@ class Simulation:
                     self.logger.info('starvation: %s; %d' % (repr(pos), self.stats.starvation_deaths))
                     # Remove dead entity from cell to prevent double-counting
                     cell.entity = None
+                    # Unregister from tracking
+                    self.unregister_entity(entity)
                     # Update display to show empty cell
                     self.surface.set_color(cell.pos, self.calc_cell_color(cell))
             # end if
@@ -225,6 +264,8 @@ class Simulation:
             child = Entity(self.stats.cycles, (entity, best_mate))
             self.land[open_pos].entity = child
             self.stats.increment_births(child)
+            # Register new entity in tracking
+            self.register_entity(child, open_pos)
 
             # adjust female parent health
             female_parent = entity if entity.sex == constants.FEMALE else best_mate
@@ -235,6 +276,8 @@ class Simulation:
                 female_parent_pos = entity_pos if entity.sex == constants.FEMALE else self.find_entity_position(best_mate, neighbor_cells)
                 if female_parent_pos:
                     self.land[female_parent_pos].entity = None
+                    # Unregister from tracking
+                    self.unregister_entity(female_parent)
                     # Update display to show empty cell
                     self.surface.set_color(female_parent_pos, self.calc_cell_color(self.land[female_parent_pos]))
             else:
@@ -270,6 +313,8 @@ class Simulation:
                     # find new pos
                     self.land[new_pos].entity = entity
                     self.land[pos].entity = None
+                    # Update tracking
+                    self.move_entity(entity, pos, new_pos)
 
                     if new_pos.y != pos.y or new_pos.x != pos.x:
                         # Update new position with entity
