@@ -143,8 +143,10 @@ class Simulation:
                     return (255, 105, 180)
             return cell.entity.calc_color(show_health=True)
         elif cell.nutrient:
+            if self.stats.show_land:
+                green = int(255 * cell.nutrient.nutrient_level / 100.0)
+                return (0, green, 0)
             return (0, 0, 0)
-            #return (0, int(255*cell.nutrient.nutrient_level/100.0), 0)
         else:
             return (0, 0, 0)
     # end def
