@@ -6,7 +6,7 @@ from phenotypes.nutrient import Nutrient
 from pos import Pos
 
 class Land:
-    def __init__(self, size, logger, life_likelyhood=0.01, nutrient_likelyhood=0.2):
+    def __init__(self, size, logger, life_likelyhood=0.1, nutrient_likelyhood=0.1):
         self.size = size
         self.width = size[0]
         self.height = size[1]
