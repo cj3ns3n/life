@@ -64,6 +64,10 @@ class Simulation:
             
             # Get current cell
             cell = self.land[pos]
+            # Enforce rule: entities and nutrients cannot occupy the same cell
+            if cell.nutrient is not None:
+                cell.nutrient = None
+                self.stats.remove_nutrient_source()
             
             # Verify entity is still at this position (should always be true with our tracking)
             if cell.entity != entity:
@@ -135,7 +139,8 @@ class Simulation:
                 # Show sex: bright blue for males, pink for females
                 if cell.entity.sex == constants.MALE:
                     return (0, 0, 255)
-                return (255, 105, 180)
+                else:
+                    return (255, 105, 180)
             return cell.entity.calc_color(show_health=True)
         elif cell.nutrient:
             return (0, 0, 0)
@@ -216,19 +221,23 @@ class Simulation:
         return best_mate
     # end def
 
-    def manage_health(self, cell):
+    def manage_health(self, cell, neighbor_cells):
         entity = cell.entity
-        nutrient = cell.nutrient
         pos = cell.pos
 
         if entity.health < 100:
             needed_nutrients = entity.size
 
-            if nutrient:
+            # Entities must be adjacent to nutrients to avoid health loss.
+            nutrient_cells = [cell for cell in neighbor_cells if cell.nutrient and cell.nutrient.nutrient_level > 0]
+            if nutrient_cells:
+                # Consume from the richest neighboring nutrient source
+                nutrient_cell = max(nutrient_cells, key=lambda c: c.nutrient.nutrient_level)
+                nutrient = nutrient_cell.nutrient
                 new_level = nutrient.nutrient_level - needed_nutrients
                 #self.logger.info('new nutrient level: %0.1f %s %s %s' % (new_level, repr(nutrient), repr(entity), pos))
                 if new_level <= 0:
-                    self.land[pos].nutrient = None
+                    nutrient_cell.nutrient = None
                     self.stats.remove_nutrient_source()
                 else:
                     nutrient.nutrient_level = new_level
@@ -300,7 +309,7 @@ class Simulation:
         entity = cell.entity
         child = None
 
-        self.manage_health(cell)
+        self.manage_health(cell, neighbor_cells)
         
         # Check if entity died from starvation in manage_health
         if cell.entity is None or entity.health <= 0:
@@ -310,7 +319,8 @@ class Simulation:
         if len(neighbors) < 4 and entity.age >= entity.mature_age:
             new_pos = self.get_new_position(pos, entity.preferred_direction)
             if new_pos:
-                if cell.nutrient and cell.nutrient.nutrient_level > 0:
+                nutrient_neighbors = any(n_cell.nutrient and n_cell.nutrient.nutrient_level > 0 for n_cell in neighbor_cells)
+                if nutrient_neighbors:
                     child = self.attempt_breeding(entity, pos, neighbor_cells, new_pos)
                     if child:
                         self.surface.set_color(new_pos, self.calc_cell_color(self.land[new_pos]))
@@ -348,8 +358,10 @@ class Simulation:
             if nutrients:
                 nutrients.nutrient_level = min(100, nutrients.nutrient_level + amount)
             else:
-                self.land[next_pos].nutrient = Nutrient(init_nutrients = amount)
-                self.stats.increment_nutrient_sources()
+                # only place nutrients in empty cells
+                if self.land[next_pos].entity is None:
+                    self.land[next_pos].nutrient = Nutrient(init_nutrients = amount)
+                    self.stats.increment_nutrient_sources()
         except IndexError:
             self.logger.error('bad food index %s - %s' % (repr(pos), repr(next_pos)), True)
 

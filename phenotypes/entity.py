@@ -14,7 +14,7 @@ class Entity:
     initial_health_factor = 20  # less than 20 gives less than 100% birth health.
     mature_age = 25
     mature_age_range = 5
-    birthing_death_rate = 0.1
+    birthing_death_rate = 0.00
     birthing_min_health = 20
     birthing_health_bonus = 0.1
 

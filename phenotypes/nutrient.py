@@ -1,5 +1,5 @@
 class Nutrient:
-    def __init__(self, init_nutrients = 100.0, replenish_rate = 1.5):
+    def __init__(self, init_nutrients = 100.0, replenish_rate = 32.5):
         self.nutrient_level = init_nutrients
         self.replenish_rate = replenish_rate
     # end def
