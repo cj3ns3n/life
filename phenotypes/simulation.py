@@ -272,6 +272,20 @@ class Simulation:
         return None
     # end def
 
+    def find_closest_opposite_sex_pos(self, entity, pos):
+        """Find the position of the closest entity of the opposite sex."""
+        closest_pos = None
+        closest_dist = None
+        for other_entity, other_pos in self.entities.items():
+            if other_entity is entity or other_entity.sex == entity.sex:
+                continue
+            dist = abs(other_pos.x - pos.x) + abs(other_pos.y - pos.y)
+            if closest_dist is None or dist < closest_dist:
+                closest_dist = dist
+                closest_pos = other_pos
+        return closest_pos
+    # end def
+
     def attempt_breeding(self, entity, entity_pos, neighbor_cells, open_pos):
         best_mate = self.find_mate(entity, neighbor_cells)
         child = None
@@ -318,18 +332,64 @@ class Simulation:
             return None
 
         neighbors = list(Cell.extract_entity_cells(neighbor_cells))
-        if len(neighbors) < 4 and entity.age >= entity.mature_age:
-            new_pos = self.get_new_position(pos, entity.preferred_direction)
-            if new_pos:
-                nutrient_neighbors = any(n_cell.nutrient and n_cell.nutrient.nutrient_level > 0 for n_cell in neighbor_cells)
-                if nutrient_neighbors:
+        if len(neighbors) < 4:
+            child = None
+            nutrient_neighbors = any(n_cell.nutrient and n_cell.nutrient.nutrient_level > 0 for n_cell in neighbor_cells)
+            opposite_adjacent = any(
+                n_cell.entity and n_cell.entity.sex != entity.sex for n_cell in neighbor_cells
+            )
+            child_adjacent = any(
+                n_cell.entity and n_cell.entity.age < n_cell.entity.mature_age for n_cell in neighbor_cells
+            )
+
+            # Try to breed first if mature and near nutrients
+            if nutrient_neighbors and entity.age >= entity.mature_age:
+                new_pos = self.get_new_position(pos, entity.preferred_direction)
+                if new_pos:
                     child = self.attempt_breeding(entity, pos, neighbor_cells, new_pos)
                     if child:
                         self.surface.set_color(new_pos, self.calc_cell_color(self.land[new_pos]))
-                elif len(list(Cell.extract_children(neighbor_cells))) == 0:
+
+            # Decide movement
+            should_move = False
+            preferred_dir = entity.preferred_direction
+
+            if not opposite_adjacent and not child_adjacent:
+                # Move toward closest opposite sex if not adjacent to opposite sex or a child
+                target_pos = self.find_closest_opposite_sex_pos(entity, pos)
+                if target_pos:
+                    dx = target_pos.x - pos.x
+                    dy = target_pos.y - pos.y
+                    if abs(dx) >= abs(dy):
+                        preferred_dir = constants.EAST if dx > 0 else constants.WEST
+                    else:
+                        preferred_dir = constants.SOUTH if dy > 0 else constants.NORTH
+                    should_move = True
+            else:
+                # Stay unless not next to food
+                if not nutrient_neighbors:
+                    should_move = True
+
+            if child is None and should_move and len(list(Cell.extract_children(neighbor_cells))) == 0:
+                # Keep juveniles near parents if possible
+                if entity.age < entity.mature_age:
+                    parents = set(entity.parents)
+                    if parents:
+                        parent_adjacent = any(
+                            n_cell.entity in parents for n_cell in neighbor_cells if n_cell.entity is not None
+                        )
+                        if parent_adjacent:
+                            return None
+                # end if
+                new_pos = self.get_new_position(pos, preferred_dir)
+                if new_pos:
                     # find new pos
                     self.land[new_pos].entity = entity
                     self.land[pos].entity = None
+                    # moving onto nutrients clears them
+                    if self.land[new_pos].nutrient is not None:
+                        self.land[new_pos].nutrient = None
+                        self.stats.remove_nutrient_source()
                     # Update tracking
                     self.move_entity(entity, pos, new_pos)
 
@@ -338,8 +398,7 @@ class Simulation:
                         self.surface.set_color(new_pos, entity.calc_color())
                         # Update old position to show it's empty (or show nutrients)
                         self.surface.set_color(pos, self.calc_cell_color(self.land[pos]))
-                # end if nutrient
-            # end if new_pos
+            # end if
         # end if
 
         return child

@@ -65,25 +65,25 @@ class Land:
         if pos.x > 0: # left neighbor
             left_pos = Pos(pos.x-1, pos.y)
             left_neighbor = self.get_entity(left_pos)
-            if (left_neighbor is None or not left_neighbor.health > 0) and self.get_nutrient(left_pos) is None:
+            if (left_neighbor is None or not left_neighbor.health > 0):
                 positions.append(Pos(pos.x-1, pos.y))
 
         if pos.x < self.size[0] - 1: # right neighbor
             right_pos = Pos(pos.x+1, pos.y)
             right_neighbor =  self.get_entity(right_pos)
-            if (right_neighbor is None or not right_neighbor.health > 0) and self.get_nutrient(right_pos) is None:
+            if (right_neighbor is None or not right_neighbor.health > 0):
                 positions.append(Pos(pos.x+1, pos.y))
 
         if pos.y > 0: # top neighbor
             top_pos = Pos(pos.x, pos.y-1)
             top_neighbor = self.get_entity(top_pos)
-            if (top_neighbor is None or not top_neighbor.health > 0) and self.get_nutrient(top_pos) is None:
+            if (top_neighbor is None or not top_neighbor.health > 0):
                 positions.append(Pos(pos.x, pos.y-1))
 
         if pos.y < self.size[1] - 1: # bottom neighbor
             bottom_pos = Pos(pos.x, pos.y+1)
             bottom_neighbor =  self.get_entity(bottom_pos)
-            if (bottom_neighbor is None or not bottom_neighbor.health > 0) and self.get_nutrient(bottom_pos) is None:
+            if (bottom_neighbor is None or not bottom_neighbor.health > 0):
                 positions.append(Pos(pos.x, pos.y+1))
 
         return positions
