@@ -272,20 +272,6 @@ class Simulation:
         return None
     # end def
 
-    def find_closest_opposite_sex_pos(self, entity, pos):
-        """Find the position of the closest entity of the opposite sex."""
-        closest_pos = None
-        closest_dist = None
-        for other_entity, other_pos in self.entities.items():
-            if other_entity is entity or other_entity.sex == entity.sex:
-                continue
-            dist = abs(other_pos.x - pos.x) + abs(other_pos.y - pos.y)
-            if closest_dist is None or dist < closest_dist:
-                closest_dist = dist
-                closest_pos = other_pos
-        return closest_pos
-    # end def
-
     def attempt_breeding(self, entity, entity_pos, neighbor_cells, open_pos):
         best_mate = self.find_mate(entity, neighbor_cells)
         child = None
@@ -352,23 +338,11 @@ class Simulation:
 
             # Decide movement
             should_move = False
-            preferred_dir = entity.preferred_direction
+            preferred_dir = random.choice([constants.NORTH, constants.SOUTH, constants.EAST, constants.WEST])
 
+            # Stay once adjacent to a mate or with a child
             if not opposite_adjacent and not child_adjacent:
-                # Move toward closest opposite sex if not adjacent to opposite sex or a child
-                target_pos = self.find_closest_opposite_sex_pos(entity, pos)
-                if target_pos:
-                    dx = target_pos.x - pos.x
-                    dy = target_pos.y - pos.y
-                    if abs(dx) >= abs(dy):
-                        preferred_dir = constants.EAST if dx > 0 else constants.WEST
-                    else:
-                        preferred_dir = constants.SOUTH if dy > 0 else constants.NORTH
-                    should_move = True
-            else:
-                # Stay unless not next to food
-                if not nutrient_neighbors:
-                    should_move = True
+                should_move = True
 
             if child is None and should_move and len(list(Cell.extract_children(neighbor_cells))) == 0:
                 # Keep juveniles near parents if possible
